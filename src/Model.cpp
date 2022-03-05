@@ -55,7 +55,13 @@ Version History
 #include <math.h>
 #include <string.h>
 #include <string>
+#ifdef GCC5X
+#include <boost/filesystem.hpp>
+namespace fs = boost::filesystem;
+#else
 #include <filesystem>
+namespace fs = std::filesystem;
+#endif
 
 #include "Model.h"
 #include "ObservationGroup.h"
@@ -72,6 +78,7 @@ Version History
 #include "DecisionModule.h"
 #include "SuperMUSE.h"
 #include "ParameterCorrection.h"
+#include "ParamInitializerABC.h"
 #include "GenConstrainedOpt.h"
 
 #include "IsoParse.h"
@@ -152,30 +159,30 @@ void Model::PreserveModel(int rank, int trial, int counter, IroncladString ofcat
    if(m_PreserveCmd == NULL)
    {   
       // Get the current path to the worker
-      std::filesystem::path directory = std::filesystem::current_path();
+      fs::path directory = fs::current_path();
       
       // Move up one directory to project directory
       directory = directory.parent_path();
 
       // Construct the archive folder
       directory /= std::string("archive");
-      if (!std::filesystem::exists(directory)) {
-          std::filesystem::create_directory(directory);
+      if (!fs::exists(directory)) {
+          fs::create_directory(directory);
       };
 
       // Construct the worker folder
       directory /= m_DirPrefix + std::to_string(rank);
-      if (!std::filesystem::exists(directory)) {
-          std::filesystem::create_directory(directory);
+      if (!fs::exists(directory)) {
+          fs::create_directory(directory);
       }
 
       // Construct the run folder 
       directory /= "run_" + std::to_string(counter - 1); // This adjusts by one to align with the model output files
-      std::filesystem::create_directory(directory);
+      fs::create_directory(directory);
 
       // Move the files from the worker to the archive
       // TODO: Add an exclude operation to prevent copying unnecessary files
-      std::filesystem::copy(std::filesystem::current_path(), directory, std::filesystem::copy_options::recursive);
+      fs::copy(fs::current_path(), directory, fs::copy_options::recursive);
 
       // Cleanup the worker
       m_pFileCleanupList->Cleanup(directory);
@@ -220,6 +227,7 @@ Model::Model(void)
 
    strcpy(m_DirPrefix, ".");
    m_pParameterCorrection = NULL;
+   m_pParamInitializer = NULL;
    m_pDecision = NULL;
    m_ExecCmd = NULL;
    m_SaveCmd = NULL;
@@ -487,14 +495,14 @@ Model::Model(void)
          // Move the file
          if(pDirName[0] != '.') {
              // Construct the worker path 
-             std::filesystem::path workerPath = std::filesystem::current_path() /= std::string(pDirName);
+             fs::path workerPath = fs::current_path() /= std::string(pDirName);
              workerPath /= tmp1;
 
              // Construct the path to the source file
-             std::filesystem::path sourcePath = std::filesystem::current_path() /= tmp1;
+             fs::path sourcePath = fs::current_path() /= tmp1;
 
             // Copy the file from the source to the worker path
-             std::filesystem::copy_file(sourcePath, workerPath);
+             fs::copy_file(sourcePath, workerPath);
                
          }/* end if() */
 
@@ -525,24 +533,24 @@ Model::Model(void)
          // Move all entries in the directory
          if(pDirName[0] != '.') {
              // Construct the worker path 
-             std::filesystem::path workerPath = std::filesystem::current_path() /= std::string(pDirName);
+             fs::path workerPath = fs::current_path() /= std::string(pDirName);
              workerPath /= tmp1;
 
-             if (~std::filesystem::exists(workerPath)) {
-                 std::filesystem::create_directories(workerPath);
+             if (~fs::exists(workerPath)) {
+                 fs::create_directories(workerPath);
              }
 
              // Construct the path to the source source
-             std::filesystem::path sourcePath = std::filesystem::current_path() /= tmp1;
+             fs::path sourcePath = fs::current_path() /= tmp1;
 
              // Copy the files
-             std::filesystem::copy(sourcePath, workerPath, std::filesystem::copy_options::recursive);
+             fs::copy(sourcePath, workerPath, fs::copy_options::recursive);
 
              // Get a list of files in the source directory
              std::vector<std::string> sourceFiles;
-             for (const auto& entry : std::filesystem::recursive_directory_iterator(sourcePath)) {
-                 if (!std::filesystem::is_directory(entry.path())) {
-                     std::filesystem::path partialPath = entry.path().lexically_relative(std::filesystem::current_path());
+             for (const auto& entry : fs::recursive_directory_iterator(sourcePath)) {
+                 if (!fs::is_directory(entry.path())) {
+                     fs::path partialPath = entry.path().lexically_relative(fs::current_path());
                      sourceFiles.push_back(partialPath.string());
                  }
              }
@@ -705,7 +713,6 @@ Model::Model(void)
       MyStrLwr(tmp2);
       if(strncmp(tmp2, "yes", 3) == 0) {m_bTryFileCleanup = true;}
    }/* end if() */
-
 
    /*
    --------------------------------------------------------------------
@@ -911,6 +918,21 @@ Model::Model(void)
       bBoxCox = true;
    }/* end if() */
 
+   /*
+   --------------------------------------------------------------------
+   Read in Parameter Initializer type, if any.
+   --------------------------------------------------------------------
+   */
+   char paramInitializer[DEF_STR_SZ];
+   strcpy(paramInitializer, "");
+   rewind(pInFile);
+   if(CheckToken(pInFile, "ParamInitializer", inFileName) == true)
+   {  
+      line = GetCurDataLine(); 
+      sscanf(line, "%s %s", tmp1, paramInitializer);
+      MyStrLwr(paramInitializer);
+   }/* end if() */
+
    fclose(pInFile);
 
    if(bSMUSE) CleanSuperMUSE();
@@ -1016,6 +1038,7 @@ Model::Model(void)
 
    CheckGlobalSensitivity();
    
+   // check for parameter correction strategy
    pInFile = fopen(inFileName, "r");
    if(pInFile == NULL)
    {
@@ -1025,6 +1048,22 @@ Model::Model(void)
    {
       m_pParameterCorrection = new ParameterCorrection(m_pParamGroup);
    }/* end if() */
+   fclose(pInFile);
+
+   // check for parameter initialization strategy
+   pInFile = fopen(inFileName, "r");
+   if(pInFile == NULL)
+   {
+      FileOpenFailure("Model::CTOR", inFileName);
+   }/* end if() */
+   if(strcmp(paramInitializer, "hamed") == 0)
+   {
+      m_pParamInitializer = new HamedParamInitializer(m_pParamGroup, pInFile);
+   }
+   else if(strcmp(paramInitializer, "kmeans") == 0)
+   {
+      m_pParamInitializer = new KMeansParamInitializer(m_pParamGroup, pInFile);
+   }
    fclose(pInFile);
 
    IncCtorCount();
@@ -1071,6 +1110,14 @@ double ExtractBoxCoxValue(void)
 }/* end ExtractBoxCoxValue() */
 
 /******************************************************************************
+Fetch the parameter initializer.
+******************************************************************************/
+ParamInitializerABC * Model::GetParamInitializerPtr(void)
+{
+   return m_pParamInitializer;
+}/* end GetParamInitializerPtr() */
+
+/******************************************************************************
 Free up memory.
 ******************************************************************************/
 void Model::Destroy(void)
@@ -1078,6 +1125,7 @@ void Model::Destroy(void)
    delete m_pObsGroup;
    delete m_pParamGroup;
    delete m_pParameterCorrection;
+   delete m_pParamInitializer;
    delete m_pObjFunc;
    delete m_FileList;
    delete m_DbaseList;
@@ -1822,10 +1870,21 @@ void Model::ExcludeConstantParameters(void)
 {
    if(m_pParamGroup == NULL) return;
 
-   int i, j, nprm;
+   int i, j, nprm, id;
    double upr, lwr;
    char tmp1[DEF_STR_SZ];
    UnchangeableString prm_name;
+   FILE * pLog;
+   
+   MPI_Comm_rank(MPI_COMM_WORLD, &id);
+   if(id == 0)
+   {
+      pLog = fopen("OstConstants0.txt", "w");
+   }
+   else
+   {
+      pLog = NULL;
+   }
 
    nprm = m_pParamGroup->GetNumParams();
 
@@ -1837,13 +1896,19 @@ void Model::ExcludeConstantParameters(void)
 
       if(upr == lwr)
       {
-         sprintf(tmp1, "%s will be treated as a constant", prm_name);
-         LogError(ERR_INS_PARM, tmp1);
+         if(pLog != NULL)
+         {
+            fprintf(pLog, "Parameter %s will be treated as a constant\n", prm_name);
+         }
          m_pParamGroup->ExcludeParam(prm_name);
          // ExcludeParam() modifies m_pParamGroup so restart the iterator
          j=0;
          nprm = m_pParamGroup->GetNumParams();
       }
+   }
+   if(pLog != NULL)
+   {
+      fclose(pLog);
    }
 } /* end ExcludeConstantParameters() */
 
