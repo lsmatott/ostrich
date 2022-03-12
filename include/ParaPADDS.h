@@ -21,9 +21,6 @@ Version History
 // forward decs
 class ModelABC;
 
-#define INIT_TASK_URANDOM 0
-#define INIT_TASK_HAMED   1
-
 /******************************************************************************
 class ParaPADDS
 ******************************************************************************/
@@ -41,7 +38,6 @@ class ParaPADDS : public AlgorithmABC
       int  GetCurrentIteration(void) { return m_CurIter; }
 
    private:
-      void InitUsingHamedMethod(int n, double * stest, double * pMin, double * pMax, int offset, int sindex, int nsubs);
       int UpdateArchive(double * pX, int nX, double * pF, int nF);
       void DestroyArchive(ArchiveStruct * pArch);
       void F(ArchiveStruct * pA);
@@ -90,8 +86,6 @@ class ParaPADDS : public AlgorithmABC
       double m_fraction1;
       int m_dominance_flag;
       unsigned int m_seed;
-      int m_InitTaskMethod;
-      int m_HamedOffset;
 
       //member funcs for interfacing with hypervolume code
       int m_dim;

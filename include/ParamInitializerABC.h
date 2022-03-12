@@ -48,6 +48,7 @@ class HamedParamInitializer : public ParamInitializerABC
 	void Write(FILE * pFile, int type);
 
 private:
+    void GetSample(double * stest,  int sindex);
 	ParameterGroup * m_pParams;
 	int m_HamedOffset;
 	int m_NumSets;
