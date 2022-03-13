@@ -95,9 +95,9 @@ HamedParamInitializer::HamedParamInitializer(ParameterGroup * pParamGroup, FILE 
 } /* end CTOR */
 
 /******************************************************************************
-InitUsingHamedMethod()
+GetSample()
 
-Initialize the solutions using Hamed's carefully constructed empirical method.
+Initialize a paramter set using Hamed's carefully constructed empirical method.
 ******************************************************************************/
 void HamedParamInitializer::GetSample(double * stest,  int sindex)
 {
