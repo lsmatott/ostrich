@@ -165,7 +165,7 @@ void KMeansParamInitializer::CreateClusters(SubcatchmentCoordStruct * data, KMea
         }
         else
         {
-            printf("WARNING - cluster %d has no members!", i);
+            fprintf(m_pLog, "WARNING - cluster %d has no members!", i);
             pKMeans->centers[i].x = 0.00;
             pKMeans->centers[i].y = 0.00;
         }
@@ -191,12 +191,13 @@ void KMeansParamInitializer::rtrim(char * pStr)
 ---------------------------------------------------------------------------- */
 void KMeansParamInitializer::PrintSubcatchmentData(SubcatchmentCoordStruct * data, int n)
 {
-    fprintf(m_pLog, "%-30s\t%-14s\t%-14s\t%s\n","NAME","X","Y","AREA");
+    fprintf(m_pLog, "%-30s\t%-14s\t%-14s\t%s\t%s\n","NAME","X","Y","AREA", "PNAME");
     if(n < 10)
     {
         for(int i = 0; i < n; i++)
         {
-            fprintf(m_pLog, "%-30s\t%f\t%f\t%f\n", data[i].name, data[i].x, data[i].y, data[i].area_ac);
+            fprintf(m_pLog, "%-30s\t%f\t%f\t%f\t%s\n", data[i].name, data[i].x, data[i].y, 
+                                                       data[i].area_ac, data[i].pname);
         }
     }
     else
@@ -204,13 +205,15 @@ void KMeansParamInitializer::PrintSubcatchmentData(SubcatchmentCoordStruct * dat
         // first 5
         for(int i = 0; i < 5; i++)
         {
-            fprintf(m_pLog, "%-30s\t%f\t%f\t%f\n", data[i].name, data[i].x, data[i].y, data[i].area_ac);
+            fprintf(m_pLog, "%-30s\t%f\t%f\t%f\t%s\n", data[i].name, data[i].x, data[i].y, 
+                                                       data[i].area_ac, data[i].pname);
         }
-        fprintf(m_pLog, "%-30s\t%-14s\t%-14s\t%s\n","...","...","...","...");
+        fprintf(m_pLog, "%-30s\t%-14s\t%-14s\t%s\t%s\n","...","...","...","...", "...");
         // last 5
         for(int i = (n-5); i < n; i++)
         {
-            fprintf(m_pLog, "%-30s\t%f\t%f\t%f\n", data[i].name, data[i].x, data[i].y, data[i].area_ac);
+            fprintf(m_pLog, "%-30s\t%f\t%f\t%f\t%s\n", data[i].name, data[i].x, data[i].y, 
+                                                   data[i].area_ac, data[i].pname);
         }
     }
     fprintf(m_pLog, "\n[%d rows x 3 columns]\n", n);
@@ -224,14 +227,15 @@ void KMeansParamInitializer::PrintSubcatchmentData(SubcatchmentCoordStruct * dat
 ---------------------------------------------------------------------------- */
 void KMeansParamInitializer::PrintClusteredData(SubcatchmentCoordStruct * data, int n)
 {
-    fprintf(m_pLog, "%-5s\t%-30s\t%-14s\t%-14s\t%-9s\t%-7s\n",
-           "index", "NAME", "CX", "CY", "subc_Area", "cluster");
+    fprintf(m_pLog, "%-5s\t%-30s\t%-14s\t%-14s\t%-9s\t%-7s\t%s\n",
+           "index", "NAME", "CX", "CY", "subc_Area", "cluster", "PName");
     if(n < 10)
     {
         for(int i = 0; i < n; i++)
         {
-            fprintf(m_pLog, "%-5d\t%-30s\t%f\t%f\t%f\t%7d\n", 
-            (i+1), data[i].name, data[i].x, data[i].y, data[i].area_ac, data[i].cluster_id);
+            fprintf(m_pLog, "%-5d\t%-30s\t%f\t%f\t%f\t%7d\t%s\n", 
+            (i+1), data[i].name, data[i].x, data[i].y, data[i].area_ac, 
+                   data[i].cluster_id, data[i].pname);
         }
     }
     else
@@ -239,16 +243,18 @@ void KMeansParamInitializer::PrintClusteredData(SubcatchmentCoordStruct * data, 
         // first 5
         for(int i = 0; i < 5; i++)
         {
-            fprintf(m_pLog, "%-5d\t%-30s\t%f\t%f\t%f\t%7d\n", 
-            (i+1), data[i].name, data[i].x, data[i].y, data[i].area_ac, data[i].cluster_id);
+            fprintf(m_pLog, "%-5d\t%-30s\t%f\t%f\t%f\t%7d\t%s\n", 
+            (i+1), data[i].name, data[i].x, data[i].y, data[i].area_ac, 
+                   data[i].cluster_id, data[i].pname);
         }
-        fprintf(m_pLog, "%-5s\t%-30s\t%-14s\t%-14s\t%-9s\t%7s\n",
-               "...","...","...","...","...","...");
+        fprintf(m_pLog, "%-5s\t%-30s\t%-14s\t%-14s\t%-9s\t%7s\t%s\n",
+               "...","...","...","...","...","...", "...");
         // last 5
         for(int i = (n-5); i < n; i++)
         {
-            fprintf(m_pLog, "%-5d\t%-30s\t%f\t%f\t%f\t%7d\n", 
-            (i+1), data[i].name, data[i].x, data[i].y, data[i].area_ac, data[i].cluster_id);
+            fprintf(m_pLog, "%-5d\t%-30s\t%f\t%f\t%f\t%7d\t%s\n", 
+            (i+1), data[i].name, data[i].x, data[i].y, data[i].area_ac, 
+                   data[i].cluster_id, data[i].pname);
         }
     }
     fprintf(m_pLog, "\n[%d rows x 5 columns]\n", n);
@@ -262,14 +268,15 @@ void KMeansParamInitializer::PrintClusteredData(SubcatchmentCoordStruct * data, 
 ---------------------------------------------------------------------------- */
 void KMeansParamInitializer::PrintWithAreas(SubcatchmentCoordStruct * data, int n)
 {
-    fprintf(m_pLog, "%-5s\t%-30s\t%-14s\t%-14s\t%-9s\t%-7s\t%-12s\n",
-           "index", "NAME", "CX", "CY", "subc_Area", "cluster", "Cluster_area");
+    fprintf(m_pLog, "%-5s\t%-30s\t%-14s\t%-14s\t%-9s\t%-7s\t%-12s\t%s\n",
+           "index", "NAME", "CX", "CY", "subc_Area", "cluster", "Cluster_area", "PNAME");
     if(n < 10)
     {
         for(int i = 0; i < n; i++)
         {
-            fprintf(m_pLog, "%-5d\t%-30s\t%f\t%f\t%f\t%7d\t%12.6f\n", 
-            (i+1), data[i].name, data[i].x, data[i].y, data[i].area_ac, data[i].cluster_id, data[i].cluster_area_ac);
+            fprintf(m_pLog, "%-5d\t%-30s\t%f\t%f\t%f\t%7d\t%12.6f\t%s\n", 
+            (i+1), data[i].name, data[i].x, data[i].y, data[i].area_ac, 
+                   data[i].cluster_id, data[i].cluster_area_ac, data[i].pname);
         }
     }
     else
@@ -277,16 +284,18 @@ void KMeansParamInitializer::PrintWithAreas(SubcatchmentCoordStruct * data, int 
         // first 5
         for(int i = 0; i < 5; i++)
         {
-            fprintf(m_pLog, "%-5d\t%-30s\t%f\t%f\t%f\t%7d\t%12.6f\n", 
-            (i+1), data[i].name, data[i].x, data[i].y, data[i].area_ac, data[i].cluster_id, data[i].cluster_area_ac);
+            fprintf(m_pLog, "%-5d\t%-30s\t%f\t%f\t%f\t%7d\t%12.6f\t%s\n", 
+            (i+1), data[i].name, data[i].x, data[i].y, data[i].area_ac, 
+                   data[i].cluster_id, data[i].cluster_area_ac, data[i].pname);
         }
-        fprintf(m_pLog, "%-5s\t%-30s\t%-14s\t%-14s\t%-9s\t%7s\t%12s\n",
-               "...","...","...","...","...","...","...");
+        fprintf(m_pLog, "%-5s\t%-30s\t%-14s\t%-14s\t%-9s\t%7s\t%12s\t%s\n",
+               "...","...","...","...","...","...","...", "...");
         // last 5
         for(int i = (n-5); i < n; i++)
         {
-            fprintf(m_pLog, "%-5d\t%-30s\t%f\t%f\t%f\t%7d\t%12.6f\n", 
-            (i+1), data[i].name, data[i].x, data[i].y, data[i].area_ac, data[i].cluster_id, data[i].cluster_area_ac);
+            fprintf(m_pLog, "%-5d\t%-30s\t%f\t%f\t%f\t%7d\t%12.6f\t%s\n", 
+            (i+1), data[i].name, data[i].x, data[i].y, data[i].area_ac, 
+                   data[i].cluster_id, data[i].cluster_area_ac, data[i].pname);
         }
     }
     fprintf(m_pLog, "\n[%d rows x 6 columns]\n", n);
@@ -303,21 +312,36 @@ SubcatchmentCoordStruct * KMeansParamInitializer::ReadCoordsFile(FILE * pIn, cha
 {
     char line[1000];
     SubcatchmentCoordStruct * pSubInfo;
-    int i, j;
+    int i, j, ncols;
     char * token;
     char s[2] = {sep, 0x0};
-    char * header = "NAME	X	Y	Area";
+    char explicit_header[] = "NAME	X	Y	Area    PNAME";
+    char implicit_header[] = "NAME	X	Y	Area";
+    char * header;
+
+    // set appropriate header and number of columns
+    if(m_ParameterMapping == PMAP_EXPLICIT)
+    {
+        header = explicit_header;
+        ncols = 5;
+    }
+    else
+    {
+        header = implicit_header;
+        ncols = 4;
+    }
+
     *n = 0;
 
     rewind(pIn);
     fgets(line, 1000, pIn);
     rtrim(line);
     // validate header
-    if(strcmp(line, header) != 0)
+    if(strncmp(line, header, strlen(header)) != 0)
     {
-        printf("Error - coords file lacks header!\n");
-        printf("Expected: |%s|\n", header);
-        printf("Actual  : |%s|\n", line);
+       fprintf(m_pLog,"Error - coords file lacks proper header!\n");
+       fprintf(m_pLog,"Expected: |%s|\n", header);
+       fprintf(m_pLog,"Actual  : |%s|\n", line);
         return NULL;
     }
     // count number of entries
@@ -361,13 +385,18 @@ SubcatchmentCoordStruct * KMeansParamInitializer::ReadCoordsFile(FILE * pIn, cha
                 {
                     pSubInfo[i].area_ac = atof(token);
                 }
+                else if((j == 4) && (m_ParameterMapping == PMAP_EXPLICIT))
+                {
+                    strncpy(pSubInfo[i].pname, token, 1000);
+                }
+
                 j++;
                 token = strtok(NULL, s);
             }/* end while() */
-            if(j != 4)
+            if(j != ncols)
             {
-                printf("Parsing error in row %d\n", i+1);
-                printf("Expected 4 fields and got %d fields instead.\n", j);
+               fprintf(m_pLog,"Parsing error in row %d\n", i+1);
+               fprintf(m_pLog,"Expected %d fields and got %d fields instead.\n", ncols, j);
                 (*n) = i + 1;
                 break;
             }
@@ -389,16 +418,30 @@ Apply the algorithm and populate the "pVals" matrix with initial parameter sets.
 ******************************************************************************/
 void KMeansParamInitializer::GetParameterSets(double ** pVals, int start)
 {
-   int i, j, end;
+   LidScenarioStruct * pScenario;
+   UnchangeableString pname;
+   int i, j, k, end;
 
    end = start + m_NumSets;
    for(i = start; i < end; i++)
    {
+      pScenario = m_pScenarios[i - start];
+
       for(j = 0; j < m_NumParams; j++)
       {
-         pVals[i][j] = m_pParams->GetParamPtr(j)->ConvertInVal(atof("0.0"));
-      }
-   }
+        pVals[i][j] = m_pParams->GetParamPtr(j)->GetEstVal();
+        pname = m_pParams->GetParamPtr(j)->GetName();
+        // find pname in scenario
+        for(k = 0; k < m_KMEANS.num_data_points; k++)
+        {
+            if(strcmp(pname, pScenario->pname) == 0)
+            {
+                pVals[i][j] = m_pParams->GetParamPtr(j)->ConvertInVal(pScenario->num_lids);
+                break;
+            }
+        }/* end for each subcatchment */
+      }/* end for each parameter */
+   }/* end for each data set */
 	return; 
 } /* end GetParameterSets() */
 
@@ -431,6 +474,7 @@ KMeansParamInitializer::KMeansParamInitializer(ParameterGroup * pParamGroup, FIL
    m_AreaPerScenario = 50.0;
    m_AreaPerLID = 440.0;
    m_AreaConversionFactor = 43560.0;
+   m_ParameterMapping = PMAP_IMPLICIT;
 
    m_pLog = fopen(m_LogFileName, "w");
 
@@ -457,15 +501,15 @@ KMeansParamInitializer::KMeansParamInitializer(ParameterGroup * pParamGroup, FIL
       {         
          if(strstr(line, "AreaPerScenario") != NULL)
          {
-            sscanf(line, "%s %f", tmp, &m_AreaPerScenario); 
+            sscanf(line, "%s %lf", tmp, &m_AreaPerScenario); 
          }/*end else if() */
          else if(strstr(line, "AreaPerLID") != NULL)
          {
-            sscanf(line, "%s %f", tmp, &m_AreaPerLID); 
+            sscanf(line, "%s %lf", tmp, &m_AreaPerLID); 
          }/*end else if() */         
          else if(strstr(line, "AreaConversionFactor") != NULL)
          {
-            sscanf(line, "%s %f", tmp, &m_AreaConversionFactor); 
+            sscanf(line, "%s %lf", tmp, &m_AreaConversionFactor); 
          }/*end else if() */         
          else if(strstr(line, "CoordsFile") != NULL)
          {
@@ -482,7 +526,20 @@ KMeansParamInitializer::KMeansParamInitializer(ParameterGroup * pParamGroup, FIL
          else if(strstr(line, "NumClusters") != NULL)
          {
             sscanf(line, "%s %d", tmp, &m_NumClusters); 
-         }/*end else if() */         
+         }/*end else if() */
+         else if(strstr(line, "ParameterMapping") != NULL)
+         {
+            sscanf(line, "%s %s", tmp, tmp2);
+            MyStrLwr(tmp2);
+            if(strcmp(tmp2, "explicit") == 0)
+            {
+                m_ParameterMapping = PMAP_EXPLICIT;
+            }
+            else
+            {
+                m_ParameterMapping = PMAP_IMPLICIT;
+            } 
+         }/*end else if() */
          else
          {
             sprintf(tmp, "Unknown token: %s", line);
@@ -495,6 +552,12 @@ KMeansParamInitializer::KMeansParamInitializer(ParameterGroup * pParamGroup, FIL
    rewind(pInFile);
 
    Configure();
+
+   /* map subcatchment names to parameter names */
+   if(m_ParameterMapping == PMAP_IMPLICIT)
+   {
+       AssignImplicitParameterNames();
+   }
 
    IncCtorCount();
 } /* end CTOR */
@@ -555,7 +618,98 @@ void KMeansParamInitializer::Write(FILE * pFile, int type)
    fprintf(pFile, "Area per LID           : %f\n", m_AreaPerLID);
    fprintf(pFile, "Area Conversion Factor : %f\n", m_AreaConversionFactor);
    fprintf(pFile, "Num Clusters           : %d\n", m_NumClusters);
+   if(m_ParameterMapping == PMAP_EXPLICIT)
+   {
+       fprintf(pFile, "Paramter Mapping   : explicit\n");
+   }
+   else
+   {
+       fprintf(pFile, "Paramter Mapping   : implicit\n");
+   }
 } /* end Write() */
+
+/******************************************************************************
+AssignImplicitParameterNames()
+
+Determine parameter names for num. lid assignments using the order in which 
+subcatchment paramters are listed in the parameter group.
+******************************************************************************/
+void KMeansParamInitializer::AssignImplicitParameterNames(void)
+{
+    int i, j, offset, np, nFound;
+    char * subcatchment_name;
+    char * parameter_name;
+
+    np = m_pParams->GetNumParams();
+    offset = np + 1;
+
+    // locate first occurrence of any subcatchment name in parameter list
+    nFound = 0;
+    for(i = 0; i < m_KMEANS.num_data_points; i++)
+    {
+        subcatchment_name = m_pDataOriginal[i].name;
+        for(j = 0; j < np; j++)
+        {
+            m_pParams->GetParamPtr(j)->GetValAsStr(parameter_name);
+
+            // match found (i.e. parameter value matches subcathment name)
+            if(strcmp(subcatchment_name, parameter_name) == 0)
+            {
+                nFound++;
+                // update offset if appropriate
+                if(j < offset)
+                {
+                    offset = j;
+                }
+                break;
+            }
+        }/* end for each parameter */
+        /* if above loop failed to break, it means there was no match */
+        if(j == np)
+        {
+            fprintf(m_pLog, "Implicit paramter mapping failed - No match for subcatchment named %s\n",
+            subcatchment_name);
+        }
+    }/* end for each subcatchment */
+
+    /* did we find enough matches */
+    if(nFound != m_KMEANS.num_data_points)
+    {
+        fprintf(m_pLog, "Implicit paramter mapping failed - Only found %d out of %d subcatchment matches\n",
+        nFound, m_KMEANS.num_data_points);
+    }
+
+    /* 
+    Perform implicit mapping - assume "num_lid" parameters are listed first in the 
+    parameter group and in the same order as subsequent subcatchment names. Given
+    this assumption, we can use the "offset" value to perform pname mappings.
+    */
+    for(i = 0; i < m_KMEANS.num_data_points; i++)
+    {
+        subcatchment_name = m_pDataOriginal[i].name;
+        strcpy(m_pDataOriginal[i].pname, "_no_implicit_match_");
+
+        for(j = 0; j < np; j++)
+        {
+            m_pParams->GetParamPtr(j)->GetValAsStr(parameter_name);
+
+            // found match, use offset to map subcatchment to match with "num_lid" parameter
+            if(strcmp(subcatchment_name, parameter_name) == 0)
+            {
+                if(j < offset)
+                {
+                    fprintf(m_pLog, 
+                    "Implicit paramter mapping failed - Subcatchment = %s , Offset = %d but match found at %d\n",
+                    subcatchment_name, offset, j);
+                }
+                else
+                {
+                    strcpy(m_pDataOriginal[i].pname, m_pParams->GetParamPtr(j - offset)->GetName());
+                }
+            }/* end if parameter match */
+        }/* end for each parameter */
+    }/* end for each subcatchment */
+}/* end AssignImplicitParameterNames() */
 
 /******************************************************************************
 Configure()
@@ -586,7 +740,7 @@ int KMeansParamInitializer::Configure(void)
     FILE * pCoordFile = fopen(m_CoordsFile, "r");
     if(pCoordFile == NULL)
     {
-        fprintf(m_pLog, "Error - can't open coordinate file (CSO014_ParkingSAimp_coord_andAREA.txt)\n");
+        fprintf(m_pLog, "Error - can't open coordinate file (%s)\n", m_CoordsFile);
         return -1;
     }
     // read the coordinate file
@@ -638,6 +792,7 @@ int KMeansParamInitializer::Configure(void)
         {
             m_pScenarios[i][j].num_lids = 0;
             m_pScenarios[i][j].name = data_merged[j].name;
+            m_pScenarios[i][j].pname = data_merged[j].pname;
         }
         for(j = 0; j < m_KMEANS.num_clusters; j++)
         {
@@ -689,7 +844,7 @@ int KMeansParamInitializer::Configure(void)
     }/* end for(each scenario) */
 
     // display results of lid assignment
-    fprintf(m_pLog, "%-4s\t%-30s\t%-7s\t%-8s\n", "iter", "Subcatchment_Name", "Cluster", "num_LIDs");
+    fprintf(m_pLog, "%-4s\t%-30s\t%-7s\t%-8s\t%s\n", "iter", "Subcatchment_Name", "Cluster", "num_LIDs", "Parameter_Name");
     for(i = 0; i < num_scenarios; i++)
     {
         for(s = 0; s < m_KMEANS.num_clusters; s++)
@@ -701,8 +856,9 @@ int KMeansParamInitializer::Configure(void)
                 {
                     if((m_pScenarios[i][j].num_lids > 0) && (data_merged[j].cluster_id == r))
                     {
-                        fprintf(m_pLog, "%-4d\t%-30s\t%-7d\t%8.2f\n", i, m_pScenarios[i][j].name,  
-                                           data_merged[j].cluster_id, m_pScenarios[i][j].num_lids);
+                        fprintf(m_pLog, "%-4d\t%-30s\t%-7d\t%8.2f\t%s\n", i, m_pScenarios[i][j].name,  
+                                           data_merged[j].cluster_id, m_pScenarios[i][j].num_lids,
+                                           m_pScenarios[i][j].pname);
                     }
                 }
                 fprintf(m_pLog, "\n");

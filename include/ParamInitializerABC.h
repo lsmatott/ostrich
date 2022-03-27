@@ -18,6 +18,9 @@ Version History
 class ParameterGroup;
 class ParameterABC;
 
+#define PMAP_EXPLICIT (0)
+#define PMAP_IMPLICIT (1)
+
 /******************************************************************************
 class ParamInitializerABC (parameter initializer) base class
 ******************************************************************************/
@@ -60,6 +63,7 @@ Supporting data structures for KMeansParamInitializer
 ******************************************************************************/
 typedef struct SUBCATCHMENT_COORD_STRUCT {
    char name[1000];
+   char pname[1000];
    double x;
    double y;
    double area_ac;
@@ -81,6 +85,7 @@ typedef struct KMEANS_CLUSTER_STRUCT {
 
 typedef struct LID_SCENARIO {
    char * name;
+   char * pname;
    double num_lids;
 } LidScenarioStruct;
 
@@ -112,6 +117,7 @@ private:
     void PrintClusteredData(SubcatchmentCoordStruct * data, int n);
     void PrintSubcatchmentData(SubcatchmentCoordStruct * data, int n);
     void rtrim(char * pStr);
+    void AssignImplicitParameterNames(void);
 
     KMeansClusterStruct m_KMEANS;
     SubcatchmentCoordStruct * m_pDataOriginal;
@@ -119,6 +125,7 @@ private:
     int ** m_pScenarioClusters;
 
 	ParameterGroup * m_pParams;
+    int m_ParameterMapping; /* how to map subcatchment names to parameter names */
     int m_NumSets; /* num scenarios */
 	int m_NumParams;
 	int m_NumClusters;
