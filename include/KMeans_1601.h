@@ -23,6 +23,7 @@ Version History
 #define KMEANS_1601_H
 
 #include <vector>
+#include <string>
 
 class KMeans_1601_Point
 {
@@ -67,7 +68,7 @@ class KMeans_1601_Alg
 {
     public:
         KMeans_1601_Alg(int K, int iterations, FILE * pOutfile);
-        void run(std::vector<KMeans_1601_Point> &all_points);
+        void run(std::vector<KMeans_1601_Point> &all_points, double ** centers);
 
     private:
         int K, iters, dimensions, total_points;
@@ -78,6 +79,6 @@ class KMeans_1601_Alg
         int getNearestClusterId(KMeans_1601_Point point);
 };
 
-int KMeans_1601_main(int argc, char **argv);
+double ** KMeans_1601_main(double ** coords, int n_coords, int n_dims, int k, FILE * pOut);
 
 #endif /* KMEANS_1601_H */

@@ -25,7 +25,6 @@ Version History
 #include <fstream>
 #include <iostream>
 #include <vector>
-#include <string>
 #include "KMeans_1601.h"
 
 using namespace std;
@@ -298,7 +297,7 @@ KMeans_1601_Alg::KMeans_1601_Alg(int K, int iterations, FILE * pOutfile)
 /******************************************************************************
 KMeans_1601_Alg::run()
 ******************************************************************************/
-void KMeans_1601_Alg::run(vector<KMeans_1601_Point> &all_points)
+void KMeans_1601_Alg::run(vector<KMeans_1601_Point> &all_points, double ** centers)
 {
     total_points = all_points.size();
     dimensions = all_points[0].getDimensions();
@@ -384,6 +383,15 @@ void KMeans_1601_Alg::run(vector<KMeans_1601_Point> &all_points)
         iter++;
     }
 
+    // return cluster centers
+    for (int i = 0; i < K; i++)
+    {        
+        for (int j = 0; j < dimensions; j++)
+        {
+            centers[i][j] = clusters[i].getCentroidByPos(j);
+        }
+    }
+
     if(pOut != NULL)
     {
         // write cluster assignments to file
@@ -420,21 +428,36 @@ void KMeans_1601_Alg::run(vector<KMeans_1601_Point> &all_points)
             }
             fprintf(pOut, ")\n");
         }
-    }
+    }/* end if(pOut != NULL) */
+
+    return;
 }
 
 /******************************************************************************
 KMeans_1601_main()
 
 This is the interface function for OSTRICH to use the KMeans_1601 implementation.
+
+Returns an array of cluster centers and also adds cluster assignment at end of
+each row of the coords array. As a result, the caller must ensure that coords 
+has "n_dims + 1" columns.
 ******************************************************************************/
-int KMeans_1601_main(double ** coords, int n_coords, int n_dims, int k, FILE * pOut)
+double ** KMeans_1601_main(double ** coords, int n_coords, int n_dims, int k, FILE * pOut)
 {
+    double ** centers;
+
     // Need 3 arguments to run, else exit
     if ((coords == NULL) || (n_coords <= 0) || (n_dims <= 0) || (k <= 0) || (pOut == NULL))
     {
         fprintf(pOut, "KMeans_1601_main() : Error - one or more invlid arguments\n");
-        return 1;
+        return NULL;
+    }
+
+    // allocate space for cluster centers return value
+    centers = new double * [k];
+    for(int i = 0; i < k; i++)
+    {
+        centers[i] = new double[n_dims];
     }
 
     // Fetching number of clusters
@@ -457,14 +480,25 @@ int KMeans_1601_main(double ** coords, int n_coords, int n_dims, int k, FILE * p
     if ((int)all_points.size() < K)
     {
         fprintf(pOut, "Error: Number of clusters greater than number of points.\n");
-        return 1;
+        for(int i = 0; i < k; i++)
+        {
+            delete [] centers[i];
+        }
+        delete [] centers;
+        return NULL;
     }
 
     // Running K-Means Clustering
     int iters = 100;
 
     KMeans_1601_Alg kmeans(K, iters, pOut);
-    kmeans.run(all_points);
+    kmeans.run(all_points, centers);
 
-    return 0;
+    // return cluster assignments
+    for(int i = 0; i < n_coords; i++)
+    {
+        coords[i][n_dims] = all_points[i].getCluster();
+    }
+
+    return centers;
 }

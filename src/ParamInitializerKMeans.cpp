@@ -18,6 +18,7 @@ Version History
 #include "ParameterGroup.h"
 #include "Exception.h"
 #include "Utility.h"
+#include "KMeans_1601.h"
 
 /* ----------------------------------------------------------------------------
    GetClusterArea()
@@ -131,48 +132,49 @@ void KMeansParamInitializer::CreateClusters(SubcatchmentCoordStruct * data, KMea
     double yc;
     FILE * pIn;
 
-    // for now read assignments from file
-    pIn = fopen("cluster_map_ipynb.out", "r");
+    // collapse data into an array
+    double ** data_as_array;
+
+    data_as_array = new double * [nData];
     for(i = 0; i < nData; i++)
     {
-        // r = (rand() % nClust) + 1;
-        fscanf(pIn, "%d,%d", &j, &r);
-        pKMeans->labels[i] = r;
+        data_as_array[i] = new double[3];
+        data_as_array[i][0] = data[i].x;
+        data_as_array[i][1] = data[i].y;
+        data_as_array[i][2] = -1; // KMeans_1601_main will place the cluster assignment here
     }
-    fclose(pIn);
-    // compute cluster centers
+
+    double ** kmeans_centers;
+    kmeans_centers = KMeans_1601_main(data_as_array, nData, 2, nClust, m_pLog);
+
+    // make cluster assignments
+    for(i = 0; i < nData; i++)
+    {
+       pKMeans->labels[i] = data_as_array[i][2];
+    }
+
+    // assign cluster centers
     for(i = 0; i < nClust; i++)
     {
-        count = 0;
-        xc = 0.00;
-        yc = 0.00;
-
-        // aggregate (x,y) values for data points in the ith cluster
-        for(j = 0; j < nData; j++)
-        {
-            if(i == pKMeans->labels[j])
-            {
-                count++;
-                xc += data[j].x;
-                yc += data[j].y;
-            }
-        }
-        // compute the center points usinmg average value
-        if(count != 0)
-        {
-            pKMeans->centers[i].x = xc / (float) count;
-            pKMeans->centers[i].y = yc / (float) count;
-        }
-        else
-        {
-            fprintf(m_pLog, "WARNING - cluster %d has no members!", i);
-            pKMeans->centers[i].x = 0.00;
-            pKMeans->centers[i].y = 0.00;
-        }
+        pKMeans->centers[i].x = kmeans_centers[i][0];
+        pKMeans->centers[i].y = kmeans_centers[i][1];
     }
 
+    // free up dynamic memory
+    for(i = 0; i < nClust; i++)
+    {
+        delete [] kmeans_centers[i];        
+    }
+    delete [] kmeans_centers;
+
+    for(i = 0; i < nData; i++)
+    {
+        delete [] data_as_array[i];
+    }
+    delete [] data_as_array;
+
     return;
-}/* end CreateKmeansClusters() */
+}/* end CreateClusters() */
 
 /* ----------------------------------------------------------------------------
    rtrim()
