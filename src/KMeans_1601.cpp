@@ -323,7 +323,7 @@ void KMeans_1601_Alg::run(vector<KMeans_1601_Point> &all_points)
             }
         }
     }
-    fprintf(pOut, "Clusters initialized = %d\n", clusters.size());
+    fprintf(pOut, "Clusters initialized = %lu\n", clusters.size());
     fprintf(pOut, "Running K-Means Clustering..\n");
 
     int iter = 1;
@@ -404,7 +404,7 @@ void KMeans_1601_Alg::run(vector<KMeans_1601_Point> &all_points)
             {
                 fprintf(pOut,"%f,", all_points[i].getVal(j));
             }
-            fprintf(pOut,"%f\n", all_points[i].getCluster());
+            fprintf(pOut,"%d\n", all_points[i].getCluster());
         }
 
         // Write cluster centers to file
