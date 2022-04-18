@@ -28,6 +28,7 @@ class KMeans_1601_Point
 {
     public:
         KMeans_1601_Point(int id, std::string line);
+        KMeans_1601_Point(int id, double * vals, int n_vals);
         int getDimensions(void);
         int getCluster(void);
         int getID(void);
@@ -40,6 +41,7 @@ class KMeans_1601_Point
         int dimensions;
         std::vector<double> values;
         std::vector<double> lineToVec(std::string &line);
+        std::vector<double> arrayToVec(double * vals, int n_vals);
 };
 
 class KMeans_1601_Cluster
@@ -64,13 +66,13 @@ class KMeans_1601_Cluster
 class KMeans_1601_Alg
 {
     public:
-        KMeans_1601_Alg(int K, int iterations, std::string output_dir);
+        KMeans_1601_Alg(int K, int iterations, FILE * pOutfile);
         void run(std::vector<KMeans_1601_Point> &all_points);
 
     private:
         int K, iters, dimensions, total_points;
         std::vector<KMeans_1601_Cluster> clusters;
-        std::string output_dir;
+        FILE * pOut;
 
         void clearClusters(void);
         int getNearestClusterId(KMeans_1601_Point point);

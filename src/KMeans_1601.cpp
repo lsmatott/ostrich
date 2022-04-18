@@ -31,6 +31,21 @@ Version History
 using namespace std;
 
 /******************************************************************************
+KMeans_1601_Point::arrayToVec()
+******************************************************************************/
+vector<double> KMeans_1601_Point::arrayToVec(double * vals, int n_vals)
+{
+    vector<double> values;
+
+    for (int i = 0; i < n_vals; i++)
+    {
+        values.push_back(vals[i]);
+    }
+
+    return values;
+}/* end arrayToVec() */
+
+/******************************************************************************
 KMeans_1601_Point::lineToVec()
 ******************************************************************************/
 vector<double> KMeans_1601_Point::lineToVec(string &line)
@@ -67,6 +82,17 @@ KMeans_1601_Point::KMeans_1601_Point(int id, string line)
 {
     pointId = id;
     values = lineToVec(line);
+    dimensions = values.size();
+    clusterId = 0; // Initially not assigned to any cluster
+}
+
+/******************************************************************************
+KMeans_1601_Point()
+******************************************************************************/
+KMeans_1601_Point::KMeans_1601_Point(int id, double * vals, int n_vals)
+{
+    pointId = id;
+    values = arrayToVec(vals, n_vals);
     dimensions = values.size();
     clusterId = 0; // Initially not assigned to any cluster
 }
@@ -262,11 +288,11 @@ int KMeans_1601_Alg::getNearestClusterId(KMeans_1601_Point point)
 /******************************************************************************
 KMeans_1601_Alg()
 ******************************************************************************/
-KMeans_1601_Alg::KMeans_1601_Alg(int K, int iterations, string output_dir)
+KMeans_1601_Alg::KMeans_1601_Alg(int K, int iterations, FILE * pOutfile)
 {
     this->K = K;
     this->iters = iterations;
-    this->output_dir = output_dir;
+    this->pOut = pOutfile;
 }
 
 /******************************************************************************
@@ -297,15 +323,13 @@ void KMeans_1601_Alg::run(vector<KMeans_1601_Point> &all_points)
             }
         }
     }
-    cout << "Clusters initialized = " << clusters.size() << endl
-            << endl;
-
-    cout << "Running K-Means Clustering.." << endl;
+    fprintf(pOut, "Clusters initialized = %d\n", clusters.size());
+    fprintf(pOut, "Running K-Means Clustering..\n");
 
     int iter = 1;
     while (true)
     {
-        cout << "Iter - " << iter << "/" << iters << endl;
+        fprintf(pOut, "Iteration %d of %d \n", iter , iters);
         bool done = true;
 
         // Add all points to their nearest cluster
@@ -354,44 +378,48 @@ void KMeans_1601_Alg::run(vector<KMeans_1601_Point> &all_points)
 
         if (done || iter >= iters)
         {
-            cout << "Clustering completed in iteration : " << iter << endl
-                    << endl;
+            fprintf(pOut, "Clustering completed in iteration %d\n", iter);
             break;
         }
         iter++;
     }
 
-    ofstream pointsFile;
-    pointsFile.open(output_dir + "/" + to_string(K) + "-points.txt", ios::out);
-
-    for (int i = 0; i < total_points; i++)
+    if(pOut != NULL)
     {
-        pointsFile << all_points[i].getCluster() << endl;
-    }
+        // write cluster assignments to file
+        fprintf(pOut, "\n-----------------------------------------------------\n");
+        fprintf(pOut, "KMeans cluster assignments\n\n");
 
-    pointsFile.close();
-
-    // Write cluster centers to file
-    ofstream outfile;
-    outfile.open(output_dir + "/" + to_string(K) + "-clusters.txt");
-    if (outfile.is_open())
-    {
-        for (int i = 0; i < K; i++)
+        // header
+        for (int j = 0; j < dimensions; j++)
         {
-            cout << "Cluster " << clusters[i].getId() << " centroid : ";
+            fprintf(pOut,"Param_%d,", j);
+        }
+        fprintf(pOut,"ClusterID\n");
+
+        // data
+        for (int i = 0; i < total_points; i++)
+        {
             for (int j = 0; j < dimensions; j++)
             {
-                cout << clusters[i].getCentroidByPos(j) << " ";    // Output to console
-                outfile << clusters[i].getCentroidByPos(j) << " "; // Output to file
+                fprintf(pOut,"%f,", all_points[i].getVal(j));
             }
-            cout << endl;
-            outfile << endl;
+            fprintf(pOut,"%f\n", all_points[i].getCluster());
         }
-        outfile.close();
-    }
-    else
-    {
-        cout << "Error: Unable to write to clusters.txt";
+
+        // Write cluster centers to file
+        fprintf(pOut, "\n-----------------------------------------------------\n");
+        fprintf(pOut, "KMeans cluster centers\n\n");
+
+        for (int i = 0; i < K; i++)
+        {
+            fprintf(pOut, "Cluster # %d centroid : ( ", clusters[i].getId());
+            for (int j = 0; j < dimensions; j++)
+            {
+                fprintf(pOut, "%f ", clusters[i].getCentroidByPos(j));
+            }
+            fprintf(pOut, ")\n");
+        }
     }
 }
 
@@ -400,57 +428,42 @@ KMeans_1601_main()
 
 This is the interface function for OSTRICH to use the KMeans_1601 implementation.
 ******************************************************************************/
-int KMeans_1601_main(int argc, char **argv)
+int KMeans_1601_main(double ** coords, int n_coords, int n_dims, int k, FILE * pOut)
 {
-    // Need 3 arguments (except filename) to run, else exit
-    if (argc != 4)
+    // Need 3 arguments to run, else exit
+    if ((coords == NULL) || (n_coords <= 0) || (n_dims <= 0) || (k <= 0) || (pOut == NULL))
     {
-        cout << "Error: command-line argument count mismatch. \n ./kmeans <INPUT> <K> <OUT-DIR>" << endl;
+        fprintf(pOut, "KMeans_1601_main() : Error - one or more invlid arguments\n");
         return 1;
     }
-
-    string output_dir = argv[3];
 
     // Fetching number of clusters
-    int K = atoi(argv[2]);
+    int K = k;
 
-    // Open file for fetching points
-    string filename = argv[1];
-    ifstream infile(filename.c_str());
-
-    if (!infile.is_open())
-    {
-        cout << "Error: Failed to open file." << endl;
-        return 1;
-    }
-
-    // Fetching points from file
+    // fetch points
     int pointId = 1;
     vector<KMeans_1601_Point> all_points;
-    string line;
 
-    while (getline(infile, line))
+    for(int i = 0; i < n_coords; i++)
     {
-        KMeans_1601_Point point(pointId, line);
+        KMeans_1601_Point point(pointId, coords[i], n_dims);
         all_points.push_back(point);
         pointId++;
     }
     
-    infile.close();
-    cout << "\nData fetched successfully!" << endl
-         << endl;
+    fprintf(pOut, "\nData fetched successfully!\n");
 
     // Return if number of clusters > number of points
     if ((int)all_points.size() < K)
     {
-        cout << "Error: Number of clusters greater than number of points." << endl;
+        fprintf(pOut, "Error: Number of clusters greater than number of points.\n");
         return 1;
     }
 
     // Running K-Means Clustering
     int iters = 100;
 
-    KMeans_1601_Alg kmeans(K, iters, output_dir);
+    KMeans_1601_Alg kmeans(K, iters, pOut);
     kmeans.run(all_points);
 
     return 0;
