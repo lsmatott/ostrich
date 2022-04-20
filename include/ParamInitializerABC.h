@@ -108,7 +108,7 @@ class KMeansParamInitializer : public ParamInitializerABC
 private:
     int Configure(void);
     double GetClusterArea(SubcatchmentCoordStruct * pData, int n, int cluster_id);
-    int PickRandomCluster(int n);
+    int PickRandomCluster(int * bag_of_ints, int max_bag_size, int * cur_bag_size);
     SubcatchmentCoordStruct * AppendClusterAreas(SubcatchmentCoordStruct * data, int n_subcatchments, int n_clusters);
     SubcatchmentCoordStruct * AppendLabels(SubcatchmentCoordStruct * data, int * labels, int n);
     void CreateClusters(SubcatchmentCoordStruct * data, KMeansClusterStruct * pKMeans);

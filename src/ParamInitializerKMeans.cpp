@@ -42,23 +42,25 @@ double KMeansParamInitializer::GetClusterArea(SubcatchmentCoordStruct * pData, i
 /* ----------------------------------------------------------------------------
    pick_random_cluster()
 
-    Pick a random cluster with replacement.
+    Pick a random cluster without replacement.
 ---------------------------------------------------------------------------- */
-int KMeansParamInitializer::PickRandomCluster(int n)
+int KMeansParamInitializer::PickRandomCluster(int * bag_of_ints, int max_bag_size, int * cur_bag_size)
 {
-    FILE * pIn;
-    int i;
-    int r;
-    char rstr[100];
+    int r, swap;
+    int r_index;
 
-    // for now read the n-th value from file
-    pIn = fopen("random_clusters.out", "r");
-    for(i = 0; i < n; i++)
-    {
-        fscanf(pIn, "%s\n", rstr);
-        r = atoi(rstr);
-    }
-    fclose(pIn);
+    // randomly select fomr the bag
+    r_index = rand() % (*cur_bag_size);
+    r = bag_of_ints[r_index];
+
+    // push selection to bottom of bag so it won't be selected again
+    swap = bag_of_ints[*cur_bag_size];
+    bag_of_ints[(*cur_bag_size) - 1] = r;
+    bag_of_ints[r_index] = swap;
+
+    // decrement bag size
+    (*cur_bag_size)--;
+
     return r;
 }/* end PickRandomCluster() */
 
@@ -776,7 +778,8 @@ int KMeansParamInitializer::Configure(void)
     int j;
     int r;
     int s;
-    int r_count;
+    int * random_clusters;
+    int bag_size;
     int s_count;
     int num_scenarios = m_NumSets;
     double area_per_scenario = m_AreaPerScenario;
@@ -801,7 +804,12 @@ int KMeansParamInitializer::Configure(void)
             m_pScenarioClusters[i][j] = -1;
         }
     }
-    r_count = 0;
+    bag_size = m_KMEANS.num_clusters;
+    random_clusters = new int[m_KMEANS.num_clusters];
+    for(i = 0; i < m_KMEANS.num_clusters; i++)
+    {
+        random_clusters[i] = i;
+    }
     for(i = 0; i < num_scenarios; i++)
     {
         assigned_area = 0;
@@ -809,8 +817,7 @@ int KMeansParamInitializer::Configure(void)
         while(assigned_area < area_per_scenario)
         {
             // pick a random cluster and determine how much area can be assigned to it
-            r_count++;
-            r = PickRandomCluster(r_count);
+            r = PickRandomCluster(random_clusters, m_KMEANS.num_clusters, &bag_size);
             m_pScenarioClusters[i][s_count] = r;
             s_count++;
             cluster_area = GetClusterArea(data_merged, n_subcatchments, r);
@@ -867,6 +874,16 @@ int KMeansParamInitializer::Configure(void)
             }
         }
     }
-    
+
+    // display results of random cluster selection
+    fprintf(m_pLog, "\nRandom Cluster Selection\n");
+    fprintf(m_pLog, "Final bag size: %d\n", bag_size);
+    fprintf(m_pLog, "Bag Contents:\n");
+    for(i = 0; i < m_KMEANS.num_clusters; i++)
+    {
+        fprintf(m_pLog, "Bag[%d] = %d\n", i, random_clusters[i]);
+    }
+    delete [] random_clusters;
+
     return 0;
 }/* end Configure()) */
