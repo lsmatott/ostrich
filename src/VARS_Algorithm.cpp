@@ -20,7 +20,7 @@ Version History
 #include "ParameterGroup.h"
 #include "ObjectiveFunction.h"
 
-#ifdef WIN32
+#ifdef _WIN32
   #include <Windows.h>
 #else
   #include <dlfcn.h>

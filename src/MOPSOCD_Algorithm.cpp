@@ -179,6 +179,8 @@ void MOPSOCD::Optimize(void)
 
    StatusStruct pStatus;
    ParameterGroup * pGroup;
+   outfile = NULL;
+   plotfile = NULL;
 
    InitFromFile(GetInFileName());
 

@@ -642,7 +642,7 @@ void KMeansParamInitializer::AssignImplicitParameterNames(void)
 {
     int i, j, offset, np, nFound;
     char * subcatchment_name;
-    char * parameter_name;
+    char * parameter_name = NULL;
 
     np = m_pParams->GetNumParams();
     offset = np + 1;
