@@ -5,3 +5,4 @@ REM clean up unneeded intermediate files
 del NighthawkIn.txt
 del NighthawkOut.txt
 del NighthawkObservations.txt
+REM PAUSE
