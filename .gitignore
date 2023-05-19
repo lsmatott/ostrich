@@ -1,3 +1,16 @@
+# Visual Studio .vs folders
+VC_Ostrich/VC_Ostrich/.vs
+VC_Ostrich/VC_OstrichMPI/.vs
+
+# Visual Studio build output
+VC_Ostrich/VC_OstrichMPI/x64/Debug
+VC_Ostrich/VC_OstrichMPI/x64/Release
+VC_Ostrich/VC_Ostrich/x64/Debug
+VC_Ostrich/VC_Ostrich/x64/Release
+
+#MS MPI
+extern/msmpi/
+
 # Prerequisites
 *.d
 
