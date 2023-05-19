@@ -11,7 +11,7 @@ Version History
 #ifndef ADO_CONNECTION_H
 #define ADO_CONNECTION_H
 
-#ifdef _WIN32
+#ifdef USE_ADO_CONNECTION
 
 #import "msado15.dll"  \
     rename( "EOF", "AdoNSEOF" )
