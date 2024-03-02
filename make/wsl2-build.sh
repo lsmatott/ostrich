@@ -12,3 +12,7 @@ if [ -f Ostrich ]; then
    mv Ostrich ../../bin/Ostrich
 fi
 
+make GCC_MPI 2>&1 | tee my_make_GCC_MPI.log
+if [ -f OstrichMpi ]; then
+   mv OstrichMpi ../../bin/OstrichMpi
+fi

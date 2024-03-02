@@ -28,7 +28,7 @@ GCC_DBG:    $(SRC_FILES_CPP) $(SRC_FILES_C)
 	rm -f *.o
 
 GCC_MPI:	$(SRC_FILES_CPP) $(SRC_FILES_C)
-	mpigxx -std=c++17 -I$(INCLUDE_DIR) $(SRC_FILES_CPP) -ldl -lstdc++fs -o OstrichMPI 
+	mpic++ -std=c++17 -I$(INCLUDE_DIR) $(SRC_FILES_CPP) -ldl -lstdc++fs -o OstrichMpi
 	rm -f *.o
 
 GCC:	$(SRC_FILES_CPP) $(SRC_FILES_C)
