@@ -22,6 +22,7 @@ Version History
                   to support ratios: TiedParamSimpleRatio and TiedParamComplexRatio.
 07-18-07    lsm   Added support for SuperMUSE
 ******************************************************************************/
+#include <string>
 #include <math.h>
 #include <string.h>
 #include <time.h>
@@ -435,7 +436,7 @@ Loop over database entries until the desired parameter is written.
 ******************************************************************************/
 void ParameterGroup::WriteDatabaseParameter(DatabaseABC * pDbase, char * find, char * replace)
 {
-   char ErrorMsg[DEF_STR_SZ];
+   std::string ErrorMsg;
    DatabaseABC * pCur = NULL;
    bool bFound = false;
    for(pCur = pDbase; pCur != NULL; pCur = pCur->GetNext())
@@ -446,8 +447,8 @@ void ParameterGroup::WriteDatabaseParameter(DatabaseABC * pDbase, char * find, c
    }
    if(bFound == false)
    {
-      sprintf(ErrorMsg, "Parameter |%s| not found in list of database entries!", find);
-      LogError(ERR_MISMATCH, ErrorMsg);
+      ErrorMsg = "Parameter |" + std::string(find) + "| not found in list of database entries!";
+      LogError(ERR_MISMATCH, ErrorMsg.data());
    }
 }/* end WriteDatabaseParameter() */
 
@@ -806,7 +807,7 @@ void ParameterGroup::InitRealParams(IroncladString pFileName)
    char tmpTrans3[DEF_STR_SZ];
    char tmpInitVal[DEF_STR_SZ];
    char tmpFixFmt[DEF_STR_SZ];
-   char logMessage[DEF_STR_SZ];
+   std::string logMessage;
    char * line;
    bool bFixFmt;
       
@@ -852,8 +853,8 @@ void ParameterGroup::InitRealParams(IroncladString pFileName)
          }/* end if() */
          else
          {
-            sprintf(logMessage, "extracted %s = %E", tmpName, initialValue);
-            //LogError(ERR_FILE_IO, logMessage);
+            logMessage = "extracted " + std::string(tmpName) + " = " + std::to_string(initialValue);
+            //LogError(ERR_FILE_IO, logMessage.data());
          }
       }/* end else if() */
       else{ initialValue = atof(tmpInitVal); }
@@ -1027,8 +1028,8 @@ void ParameterGroup::InitComboParams(IroncladString pFileName)
       }
       else
       {
-         sprintf(lineStr, "InitComboParams(): unknown combinatorial type |%s|", typeStr);
-         LogError(ERR_FILE_IO, lineStr);
+         std::string msg = "InitComboParams(): unknown combinatorial type |" + std::string(typeStr) + "|";
+         LogError(ERR_FILE_IO, msg.data());
          ExitProgram(1);
       }
       MEM_CHECK(m_pList[i]);
@@ -1054,7 +1055,7 @@ void ParameterGroup::InitTiedParams(IroncladString pFileName)
    char typeStr[DEF_STR_SZ]; //type of realtionship (linear, exp, or log)
    char * lineStr;
    char tmpStr[DEF_STR_SZ];
-   char msg[DEF_STR_SZ];
+   std::string msg;
    bool invalidNumParams;
       
    pFile = fopen(pFileName, "r");
@@ -1122,8 +1123,8 @@ void ParameterGroup::InitTiedParams(IroncladString pFileName)
            pParams[n] = GetMetaParam(tmpStr);
            if(pParams[n].pParam == NULL)
            {
-              sprintf(msg, "InitTiedParams(): unknown parameter |%s|", tmpStr);
-              LogError(ERR_FILE_IO, msg);
+              msg = "InitTiedParams(): unknown parameter |" + std::string(tmpStr) +"|";
+              LogError(ERR_FILE_IO, msg.data());
               ExitProgram(1);
            }
          }/* end for() */
@@ -1197,8 +1198,8 @@ void ParameterGroup::InitTiedParams(IroncladString pFileName)
          }
          else
          {
-            sprintf(msg, "InitTiedParams(): unknown relationship type |%s|", typeStr);
-            LogError(ERR_FILE_IO, msg);
+            msg = "InitTiedParams(): unknown relationship type |" + std::string(typeStr) + "|";
+            LogError(ERR_FILE_IO, msg.data());
             ExitProgram(1);
          }
 
@@ -1208,8 +1209,8 @@ void ParameterGroup::InitTiedParams(IroncladString pFileName)
          */
          if(invalidNumParams == true)
          {
-            sprintf(msg, "InitTiedParams(): invalid # of params (%d) for type (%s)", np, typeStr);
-            LogError(ERR_FILE_IO, msg);
+            msg = "InitTiedParams(): invalid # of params (" + std::to_string(np) + ") for type (" + std::string(typeStr) +")";
+            LogError(ERR_FILE_IO, msg.data());
             ExitProgram(1);
          }
 	  }
@@ -1247,9 +1248,9 @@ void ParameterGroup::InitGeomParams(IroncladString pFileName)
    char * pTok;
    char nameStr[DEF_STR_SZ]; //name of geometry parameter
    char typeStr[DEF_STR_SZ]; //type of geometry (poly2, poly3 or line3)
-   char * lineStr; 
-   char msg[DEF_STR_SZ];   
+   char * lineStr;    
    char tmpx[DEF_STR_SZ], tmpy[DEF_STR_SZ], tmpz[DEF_STR_SZ], tmpr[DEF_STR_SZ];
+   std::string msg;
       
    pFile = fopen(pFileName, "r");
 
@@ -1346,8 +1347,8 @@ void ParameterGroup::InitGeomParams(IroncladString pFileName)
          }
          else
          {
-            sprintf(msg, "unknown geomtry type |%s|", typeStr);
-            LogError(ERR_FILE_IO, msg);
+            msg = "unknown geomtry type |" + std::string(typeStr) + "|";
+            LogError(ERR_FILE_IO, msg.data());
             ExitProgram(1);
          }         
 
@@ -1436,7 +1437,7 @@ void ParameterGroup::CheckTemplateFiles(FilePair * pList)
    FilePair * pCur;
    FilePipe * pPipe;
    UnchangeableString name;
-   char msg[DEF_STR_SZ];
+   std::string msg;
    int i;
    bool found;
 
@@ -1458,8 +1459,8 @@ void ParameterGroup::CheckTemplateFiles(FilePair * pList)
       }
       if(found == false)
       {
-         sprintf(msg, "Parameter |%s| not found in any template file", name);
-         LogError(ERR_FILE_IO, msg);
+         msg = "Parameter |" + std::string(name) + "| not found in any template file";
+         LogError(ERR_FILE_IO, msg.data());
       }
    }
    //check tied parameters
@@ -1480,8 +1481,8 @@ void ParameterGroup::CheckTemplateFiles(FilePair * pList)
       }
       if(found == false)
       {
-         sprintf(msg, "Parameter |%s| not found in any template file", name);
-         LogError(ERR_FILE_IO, msg);
+         msg = "Parameter |" + std::string(name) +"| not found in any template file";
+         LogError(ERR_FILE_IO, msg.data());
       }
    }
 
@@ -1503,8 +1504,8 @@ void ParameterGroup::CheckTemplateFiles(FilePair * pList)
       }
       if(found == false)
       {
-         sprintf(msg, "Parameter |%s| not found in any template file", name);
-         LogError(ERR_FILE_IO, msg);
+         msg = "Parameter |" + std::string(name) +"| not found in any template file";
+         LogError(ERR_FILE_IO, msg.data());
       }
    }
 
@@ -1530,7 +1531,7 @@ void ParameterGroup::CheckMnemonics(void)
 {
    UnchangeableString name;
    UnchangeableString comp;
-   char msg[DEF_STR_SZ];
+   std::string msg;
    int i, j;
    bool found = false;
 
@@ -1545,8 +1546,8 @@ void ParameterGroup::CheckMnemonics(void)
          comp = m_pList[j]->GetName();
          if((i != j) && (strstr(comp, name) != NULL))
          {
-            sprintf(msg, "|%s| is a substring of |%s|", name, comp);
-            LogError(ERR_PRM_NEST, msg);
+            msg = "|" + std::string(name) + "| is a substring of |" + std::string(comp) +"|";
+            LogError(ERR_PRM_NEST, msg.data());
             found = true;
          }
       }
@@ -1557,8 +1558,8 @@ void ParameterGroup::CheckMnemonics(void)
          comp = m_pTied[j]->GetName();
          if(strstr(comp, name) != NULL)
          {
-            sprintf(msg, "|%s| is a substring of |%s|", name, comp);
-            LogError(ERR_PRM_NEST, msg);
+            msg = "|" + std::string(name) + "| is a substring of |" + std::string(comp) + "|";
+            LogError(ERR_PRM_NEST, msg.data());
             found = true;
          }
       }
@@ -1569,8 +1570,8 @@ void ParameterGroup::CheckMnemonics(void)
          comp = m_pGeom[j]->GetName();
          if(strstr(comp, name) != NULL)
          {
-            sprintf(msg, "|%s| is a substring of |%s|", name, comp);
-            LogError(ERR_PRM_NEST, msg);
+            msg = "|" + std::string(name) + "| is a substring of |" + std::string(comp) + "|";
+            LogError(ERR_PRM_NEST, msg.data());
             found = true;
          }
       }
@@ -1588,8 +1589,8 @@ void ParameterGroup::CheckMnemonics(void)
          comp = m_pList[j]->GetName();
          if(strstr(comp, name) != NULL)
          {
-            sprintf(msg, "|%s| is a substring of |%s|", name, comp);
-            LogError(ERR_PRM_NEST, msg);
+            msg = "|" + std::string(name) + "| is a substring of |" + std::string(comp) + "|";
+            LogError(ERR_PRM_NEST, msg.data());
             found = true;
          }
       }
@@ -1600,8 +1601,8 @@ void ParameterGroup::CheckMnemonics(void)
          comp = m_pTied[j]->GetName();
          if((i != j) && (strstr(comp, name) != NULL))
          {
-            sprintf(msg, "|%s| is a substring of |%s|", name, comp);
-            LogError(ERR_PRM_NEST, msg);
+            msg = "|" + std::string(name) + "| is a substring of |" + std::string(comp) + "|";
+            LogError(ERR_PRM_NEST, msg.data());
             found = true;
          }
       }
@@ -1612,8 +1613,8 @@ void ParameterGroup::CheckMnemonics(void)
          comp = m_pGeom[j]->GetName();
          if(strstr(comp, name) != NULL)
          {
-            sprintf(msg, "|%s| is a substring of |%s|", name, comp);
-            LogError(ERR_PRM_NEST, msg);
+            msg = "|" + std::string(name) + "| is a substring of |" + std::string(comp) + "|";
+            LogError(ERR_PRM_NEST, msg.data());
             found = true;
          }
       }
@@ -1630,8 +1631,8 @@ void ParameterGroup::CheckMnemonics(void)
          comp = m_pList[j]->GetName();
          if(strstr(comp, name) != NULL)
          {
-            sprintf(msg, "|%s| is a substring of |%s|", name, comp);
-            LogError(ERR_PRM_NEST, msg);
+            msg = "|" + std::string(name) + "| is a substring of |" + std::string(comp) + "|";
+            LogError(ERR_PRM_NEST, msg.data());
             found = true;
          }
       }
@@ -1642,8 +1643,8 @@ void ParameterGroup::CheckMnemonics(void)
          comp = m_pTied[j]->GetName();
          if(strstr(comp, name) != NULL)
          {
-            sprintf(msg, "|%s| is a substring of |%s|", name, comp);
-            LogError(ERR_PRM_NEST, msg);
+            msg = "|" + std::string(name) + "| is a substring of |" + std::string(comp) + "|";
+            LogError(ERR_PRM_NEST, msg.data());
             found = true;
          }
       }
@@ -1654,8 +1655,8 @@ void ParameterGroup::CheckMnemonics(void)
          comp = m_pGeom[j]->GetName();
          if((i != j) && (strstr(comp, name) != NULL))
          {
-            sprintf(msg, "|%s| is a substring of |%s|", name, comp);
-            LogError(ERR_PRM_NEST, msg);
+            msg = "|" + std::string(name) + "| is a substring of |" + std::string(comp) + "|";
+            LogError(ERR_PRM_NEST, msg.data());
             found = true;
          }
       }
@@ -1675,7 +1676,7 @@ are successfuly corrected, false otherwise.
 ******************************************************************************/
 bool ParameterGroup::FixGeometry(void)
 {
-   char msg[DEF_STR_SZ];
+   std::string msg;
    bool bi, b;
    int i, j;
 
@@ -1692,8 +1693,8 @@ bool ParameterGroup::FixGeometry(void)
       bi = m_pGeom[i]->Reorder();
       if(bi == false)
       { 
-         sprintf(msg, "geometry reorder failed |%s|", m_pGeom[i]->GetName());
-         LogError(ERR_MISMATCH, msg);
+         msg = "geometry reorder failed |" + std::string(m_pGeom[i]->GetName()) + "|";
+         LogError(ERR_MISMATCH, msg.data());
          b = false;
       }
    }/* end for() */
@@ -1706,9 +1707,8 @@ bool ParameterGroup::FixGeometry(void)
          bi = m_pGeom[i]->FixVertices(m_pGeom[j]);
          if(bi == false)
          { 
-            sprintf(msg, "fix-vertex geometry failed |%s| and |%s|", 
-                    m_pGeom[i]->GetName(), m_pGeom[j]->GetName());
-            LogError(ERR_MISMATCH, msg);
+            msg = "fix-vertex geometry failed |" + std::string(m_pGeom[i]->GetName()) + "| and |" + std::string(m_pGeom[j]->GetName()) +"|";
+            LogError(ERR_MISMATCH, msg.data());
             b = false;
          }
       }
@@ -1784,13 +1784,13 @@ For each parameter, check that the upper bound is greater than the lower bound.
 void ParameterGroup::CheckBounds(void)
 {
    int i;
-   char msg[DEF_STR_SZ];
    for(i = 0; i < m_NumParams; i++)
    {     
       if(m_pList[i]->GetUprBnd() < m_pList[i]->GetLwrBnd())
       {
-         sprintf(msg, "Parameter (%s) has incorrect bounds (upper bound less than lower bound)\n", m_pList[i]->GetName());
-         LogError(ERR_FILE_IO, msg);
+         std::string msg;
+         msg = "Parameter (" + std::string(m_pList[i]->GetName()) +") has incorrect bounds (upper bound less than lower bound)\n";
+         LogError(ERR_FILE_IO, msg.data());
          ExitProgram(1);
       }
    }

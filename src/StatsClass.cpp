@@ -57,6 +57,7 @@ Version History
                      MMRI
 07-18-07    lsm   Added support for SuperMUSE
 ******************************************************************************/
+#include <string>
 #include <mpi.h>
 #include <math.h>
 #include <string.h>
@@ -2486,7 +2487,7 @@ separate Ostrich optimization on the internaa BoxCoxModel() objective function.
 void StatsClass::CalcBestBoxCox(void)
 {
    int id;
-   char cmd[DEF_STR_SZ];
+   std::string cmd;
    char * line;
    int max_line_size;
    m_BestBoxCoxVal = 0.00;
@@ -2604,12 +2605,12 @@ End1dSearch\n");
    MyStrRep(OstExe, "OstrichMPI", "Ostrich");
    MyStrRep(OstExe, "OstrichFMPI", "Ostrich");
    #ifdef _WIN32
-      sprintf(cmd, "cd BoxCoxModel & %s > NUL & cd ..", OstExe);
+      cmd = "cd BoxCoxModel & " + std::string(OstExe) + " > NUL & cd ..";
    #else
-      sprintf(cmd, "cd BoxCoxModel; %s > /dev/null; cd ..", OstExe);
+      cmd = "cd BoxCoxModel; " + std::string(OstExe) +" > /dev/null; cd ..";
    #endif
    //printf("Launching Ostrich using the following command |%s|\n", cmd);
-   system(cmd);
+   system(cmd.data());
 
    //retrieve result   
    #ifdef _WIN32
@@ -4164,7 +4165,7 @@ void StatsClass::WriteResiduals(int step, char * prefix)
    double m, p, w, d; //measured, predicted, weight, difference
    char fname[1000];
    char pname[1000];
-   char cmd[1000];
+   std::string cmd;
    FILE * pFile;
 
    n = m_NumObs - m_NumHeldObs;
@@ -4216,11 +4217,11 @@ void StatsClass::WriteResiduals(int step, char * prefix)
    else if (fprevbest < fcur) 
    {
       #ifdef _WIN32
-         sprintf(cmd, "copy %s %s", pname, fname);
+         cmd = "copy " + std::string(pname) + " " + std::string(fname);
       #else
-         sprintf(cmd, "cp %s %s", pname, fname);
+         cmd = "cp " + std::string(pname) + " " + std::string(fname);
       #endif
-      system(cmd);
+      system(cmd.data());
 
       return;
    }

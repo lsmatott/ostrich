@@ -10,6 +10,7 @@ are simpler versions of the standard (complex) model.
 Version History
 04-04-06    lsm   added copyright information and initial comments.
 ******************************************************************************/
+#include <string>
 #include <mpi.h>
 #include <string.h>
 #include <stdlib.h>
@@ -50,6 +51,7 @@ SurrogateModel::SurrogateModel
    char tmp1[DEF_STR_SZ];
    char tmp2[DEF_STR_SZ];
    char tmp3[DEF_STR_SZ];
+   std::string msg;
    UnmoveableString pDir = GetExeDirName();
    
    m_Counter = 0;
@@ -110,8 +112,8 @@ SurrogateModel::SurrogateModel
    }   
    if(MY_ACCESS(tmp2, 0 ) == -1)
    {
-      sprintf(tmp1, "Model executable (|%s|) not found", tmp2);
-      LogError(ERR_FILE_IO, tmp1);
+      msg = "Model executable (|" + std::string(tmp2) + "|) not found";
+      LogError(ERR_FILE_IO, msg.data());
       ExitProgram(1);
    }
 

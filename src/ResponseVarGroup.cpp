@@ -13,6 +13,7 @@ Version History
 01-20-05    lsm   added support for weighted sum tied resp. vars.
 01-01-07    lsm   Revised ValueExtractor CTOR interface. 
 ******************************************************************************/
+#include <string>
 #include <string.h>
 #include <stdlib.h>
 
@@ -111,7 +112,7 @@ and stores them in the current value field.
 ******************************************************************************/
 void ResponseVarGroup::ExtractVals(void)
 { 
-   char errMsg[DEF_STR_SZ];
+   std::string errMsg;
    bool bOk;
    int i;
    double currentValue;
@@ -132,23 +133,23 @@ void ResponseVarGroup::ExtractVals(void)
       keyword = m_pRespVarList[i]->GetKeyword();
       tok = m_pRespVarList[i]->GetToken();
       bOk = m_pRespFiles->ExtractValue(name, keyword, line, col, tok, &currentValue);
-	  if(bOk == false)
-	  {
-		 LogError(ERR_CONTINUE,"Ostrich failed to process the following response variable:");
-		 sprintf(errMsg, "Name    : %s", m_pRespVarList[i]->GetName());
-		 LogError(ERR_CONTINUE, errMsg);
-		 sprintf(errMsg, "File    : %s", name);
-		 LogError(ERR_CONTINUE, errMsg);
-		 sprintf(errMsg, "Line    : %d", line);
-		 LogError(ERR_CONTINUE, errMsg);
-		 sprintf(errMsg, "Column  : %d", col);
-		 LogError(ERR_CONTINUE, errMsg);
-		 sprintf(errMsg, "Keyword : %s", keyword);
-		 LogError(ERR_CONTINUE, errMsg);
-		 sprintf(errMsg, "Token   : '%c'", tok);
-		 LogError(ERR_CONTINUE, errMsg);
-	     ExitProgram(1);
-	  }
+      if(bOk == false)
+      {
+         LogError(ERR_CONTINUE,"Ostrich failed to process the following response variable:");
+         errMsg = "Name    : " + std::string( m_pRespVarList[i]->GetName());
+         LogError(ERR_CONTINUE, errMsg.data());
+         errMsg = "File    : " + std::string(name);
+         LogError(ERR_CONTINUE, errMsg.data());
+         errMsg = "Line    : " + std::to_string( line);
+         LogError(ERR_CONTINUE, errMsg.data());
+         errMsg = "Column  : " + std::to_string(col);
+         LogError(ERR_CONTINUE, errMsg.data());
+         errMsg = "Keyword : " + std::string(keyword);
+         LogError(ERR_CONTINUE, errMsg.data());
+         errMsg = "Token   : '" + std::to_string(tok) + "'";
+         LogError(ERR_CONTINUE, errMsg.data());
+         ExitProgram(1);
+      }
       m_pRespVarList[i]->SetCurrentVal(currentValue);
    } /* end for() */
 } /* end ExtractVals() */
@@ -161,7 +162,7 @@ stores them in the initial value field.
 ******************************************************************************/
 void ResponseVarGroup::InitializeVals(void)
 { 
-   char errMsg[DEF_STR_SZ];
+   std::string errMsg;
    bool bOk;
    int i;
    double initialValue;
@@ -182,23 +183,23 @@ void ResponseVarGroup::InitializeVals(void)
       keyword = m_pRespVarList[i]->GetKeyword();
       tok = m_pRespVarList[i]->GetToken();
       bOk = m_pRespFiles->ExtractValue(name, keyword, line, col, tok, &initialValue);
-	  if(bOk == false)
-	  {
-		 LogError(ERR_CONTINUE,"Ostrich failed to process the following response variable:");
-		 sprintf(errMsg, "Name    : %s", m_pRespVarList[i]->GetName());
-		 LogError(ERR_CONTINUE, errMsg);
-		 sprintf(errMsg, "File    : %s", name);
-		 LogError(ERR_CONTINUE, errMsg);
-		 sprintf(errMsg, "Line    : %d", line);
-		 LogError(ERR_CONTINUE, errMsg);
-		 sprintf(errMsg, "Column  : %d", col);
-		 LogError(ERR_CONTINUE, errMsg);
-		 sprintf(errMsg, "Keyword : %s", keyword);
-		 LogError(ERR_CONTINUE, errMsg);
-		 sprintf(errMsg, "Token   : '%c'", tok);
-		 LogError(ERR_CONTINUE, errMsg);
-	     ExitProgram(1);
-	  }
+      if(bOk == false)
+      {
+         LogError(ERR_CONTINUE,"Ostrich failed to process the following response variable:");
+         errMsg = "Name    : " + std::string(m_pRespVarList[i]->GetName());
+         LogError(ERR_CONTINUE, errMsg.data());
+         errMsg = "File    : " + std::string(name);
+         LogError(ERR_CONTINUE, errMsg.data());
+         errMsg = "Line    : " + std::to_string(line);
+         LogError(ERR_CONTINUE, errMsg.data());
+         errMsg = "Column  : " + std::to_string(col);
+         LogError(ERR_CONTINUE, errMsg.data());
+         errMsg = "Keyword : " + std::string(keyword);
+         LogError(ERR_CONTINUE, errMsg.data());
+         errMsg = "Token   : '" + std::to_string(tok)+ "'";
+         LogError(ERR_CONTINUE, errMsg.data());
+         ExitProgram(1);
+      }
       m_pRespVarList[i]->SetInitialVal(initialValue);
    } /* end for() */
 } /* end InitializeVals() */
@@ -599,7 +600,7 @@ void ResponseVarGroup::InitTiedRespVars(IroncladString pFileName)
    char typeStr[DEF_STR_SZ]; //type of relationship
    char * lineStr;
    char tmpStr[DEF_STR_SZ];
-   char msg[DEF_STR_SZ];
+   std::string msg;
    bool invNRV;
 
    pFile = fopen(pFileName, "r");
@@ -671,8 +672,8 @@ void ResponseVarGroup::InitTiedRespVars(IroncladString pFileName)
          pTies[n] = GetRespVarPtr(tmpStr);
          if(pTies[n] == NULL)
          {
-            sprintf(msg, "InitTiedRespVars(): unknown response variable |%s|", tmpStr);
-            LogError(ERR_FILE_IO, msg);
+            msg = "InitTiedRespVars(): unknown response variable |" + std::string(tmpStr) + "|";
+            LogError(ERR_FILE_IO, msg.data());
             ExitProgram(1);
          }         
       }/* end for() */
@@ -703,8 +704,8 @@ void ResponseVarGroup::InitTiedRespVars(IroncladString pFileName)
       }
       else
       {
-         sprintf(msg, "InitTiedRespVars(): unknown relationship type |%s|", typeStr);
-         LogError(ERR_FILE_IO, msg);
+         msg = "InitTiedRespVars(): unknown relationship type |" + std::string(typeStr) + "|";
+         LogError(ERR_FILE_IO, msg.data());
          ExitProgram(1);
       }
 
@@ -714,8 +715,8 @@ void ResponseVarGroup::InitTiedRespVars(IroncladString pFileName)
       */
       if(invNRV == true)
       {
-         sprintf(msg, "InitTiedRespVars(): invalid # of response variables (%d) for type (%s)", nrv, typeStr);
-         LogError(ERR_FILE_IO, msg);
+         msg = "InitTiedRespVars(): invalid # of response variables (" + std::to_string(nrv) + ") for type (" + std::string(typeStr) +")";
+         LogError(ERR_FILE_IO, msg.data());
          ExitProgram(1);
       }
 

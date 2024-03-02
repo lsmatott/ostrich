@@ -8,6 +8,7 @@ Intereface for external parameter correction algorithm.
 Version History
 09-18-12    lsm   added copyright information and initial comments.
 ******************************************************************************/
+#include <string>
 #include <string.h>
 #include <stdlib.h>
 #include <math.h>
@@ -105,8 +106,9 @@ ParameterCorrection::ParameterCorrection(ParameterGroup * pGroup)
          }
          if(MY_ACCESS(tmp2, 0 ) == -1)
          {
-            sprintf(tmp1, "Parameter correction executable (|%s|) not found", tmp2);
-            LogError(ERR_FILE_IO, tmp1);
+            std::string msg;
+            msg = "Parameter correction executable (|" + std::string(tmp2) + "|) not found";
+            LogError(ERR_FILE_IO, msg.data());
             ExitProgram(1);
          }
 

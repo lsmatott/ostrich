@@ -120,15 +120,15 @@ void Model::PerformParameterCorrections(void)
  SaveBest()
 ******************************************************************************/
 void Model::SaveBest(int id)
-{
-   char saveDir[DEF_STR_SZ];
+{   
    if(m_bSave)
    {
       //cd to model subdirectory, if needed
       if(m_DirPrefix[0] != '.') 
       {
-         sprintf(saveDir, "%s%d", m_DirPrefix, id);
-         MY_CHDIR(saveDir);
+         std::string saveDir;         
+         saveDir = std::string(m_DirPrefix) + std::to_string(id);
+         MY_CHDIR(saveDir.data());
       }
  
       system(m_SaveCmd);
@@ -146,8 +146,6 @@ void Model::SaveBest(int id)
 ******************************************************************************/
 void Model::PreserveModel(int rank, int trial, int counter, IroncladString ofcat)
 {
-   char tmp[DEF_STR_SZ];
-
    if(m_bPreserveModelOutput == false)
    {
       return;
@@ -191,16 +189,22 @@ void Model::PreserveModel(int rank, int trial, int counter, IroncladString ofcat
    /* run the user-supplied preservation command */
    else
    {
-      sprintf(tmp, "%s %d %d %d %s", m_PreserveCmd, rank, trial, counter, ofcat); 
+      std::string tmp;
+
+      tmp = std::string(m_PreserveCmd) + " " + 
+            std::to_string(rank) + " " + 
+            std::to_string(trial) + " " + 
+            std::to_string(counter) + " " +
+            std::string(ofcat); 
 
       #ifdef _WIN32 //windows version
-         strcat(tmp, " > OstPreserveModelOut.txt");
+         tmp += std::string(" > OstPreserveModelOut.txt");
       #else //Linux (bash, dash, and csh)
          // '>&' redircts both output and error
-         strcat(tmp, " > OstPreserveModelOut.txt 2>&1"); 
+         tmp += std::string(" > OstPreserveModelOut.txt 2>&1"); 
       #endif
 
-      system(tmp);
+      system(tmp.data());
    }
 }/* end PreserveModel() */
 
@@ -302,11 +306,13 @@ Model::Model(void)
 
    if(pDirName[0] != '.')
    {
+      std::string dirName;
+      std::string mkdirCmd;
       MPI_Comm_rank(MPI_COMM_WORLD, &id);
-      sprintf(tmp1, "%d", id);
-      strcat(pDirName, tmp1);      
-      sprintf(tmp1, "mkdir %s", pDirName);
-      system(tmp1);      
+      dirName = std::string(pDirName) + std::to_string(id);
+      strcpy(pDirName, dirName.data());
+      mkdirCmd = "mkdir " + dirName;
+      system(mkdirCmd.data());      
    }/* end if() */
 
    /*
@@ -385,13 +391,14 @@ Model::Model(void)
    }/* end if() */
 
    if((pDirName[0] != '.') && (m_InternalModel == false))
-   {      
+   {
+      std::string copyCmd;
       #ifdef _WIN32
-         sprintf(tmp2, "copy %s %s", tmp1, pDirName);
+         copyCmd = "copy " + std::string(tmp1) + " " + std::string(pDirName);
       #else
-         sprintf(tmp2, "cp %s %s", tmp1, pDirName);
+         copyCmd = "oy " + std::string(tmp1) + " " + std::string(pDirName);      
       #endif
-      system(tmp2);
+      system(copyCmd.data());
    } /* end if() */
 
    if(m_InternalModel == false)
@@ -615,12 +622,13 @@ Model::Model(void)
 
       if(pDirName[0] != '.')
       {
+         std::string copyCmd;
          #ifdef _WIN32
-            sprintf(tmp2, "copy %s %s", tmp1, pDirName);
+            copyCmd = "copy " + std::string(tmp1) + " " + std::string(pDirName);
          #else
-            sprintf(tmp2, "cp %s %s", tmp1, pDirName);
+            copyCmd = "cp " + std::string(tmp1) + " " + std::string(pDirName);
          #endif
-         system(tmp2);
+         system(copyCmd.data());
       } /* end if() */
 
       //make sure the executable exists
@@ -634,8 +642,9 @@ Model::Model(void)
       }
       if(MY_ACCESS(tmp2, 0 ) == -1)
       {
-         sprintf(tmp1, "File for saving best solution (|%s|) not found", tmp2);
-         LogError(ERR_FILE_IO, tmp1);
+         std::string msg;
+         msg = "File for saving best solution (|" + std::string(tmp2) + "|) not found";
+         LogError(ERR_FILE_IO, msg.data());
          ExitProgram(1);
       }
 
@@ -783,12 +792,13 @@ Model::Model(void)
          //stage to workdir if needed
          if(pDirName[0] != '.')
          {
+            std::string copyCmd;
             #ifdef _WIN32
-               sprintf(tmp2, "copy %s %s", tmp1, pDirName);
+               copyCmd = "copy " + std::string(tmp1) + " " + std::string(pDirName);
             #else
-               sprintf(tmp2, "cp %s %s", tmp1, pDirName);
+               copyCmd = "cp " + std::string(tmp1) + " " + std::string(pDirName);
             #endif
-            system(tmp2);
+            system(copyCmd.data());
          } /* end if() */
 
          //make sure the executable exists
@@ -802,8 +812,9 @@ Model::Model(void)
          }
          if(MY_ACCESS(tmp2, 0 ) == -1)
          {
-            sprintf(tmp1, "File for preserving model output (|%s|) not found", tmp2);
-            LogError(ERR_FILE_IO, tmp1);
+            std::string msg;
+            msg = "File for preserving model output (|" + std::string(tmp2) + "|) not found";
+            LogError(ERR_FILE_IO, msg.data());
             ExitProgram(1);
          }
 
@@ -1764,7 +1775,7 @@ void Model::Write(double objFuncVal)
 {
    ResponseVarGroup * pRespVarGroup;
    FILE * pFile;
-   char name[DEF_STR_SZ];
+   std::string name;
    int id;   
 
    pRespVarGroup = NULL;
@@ -1774,18 +1785,18 @@ void Model::Write(double objFuncVal)
    }
 
    MPI_Comm_rank(MPI_COMM_WORLD, &id);
-   sprintf(name, "OstModel%d.txt", id);
+   name = "OstModel" + std::to_string(id) + ".txt";
 
    if(m_firstCall == true) 
    {
-      pFile = fopen(name, "r");
+      pFile = fopen(name.data(), "r");
       if(pFile != NULL)
       {
          fclose(pFile);
          //don't remove if using WarmStart
          if(m_bWarmStart == false)
          {
-            if(remove(name) != 0)
+            if(remove(name.data()) != 0)
             {
                LogError(ERR_FILE_IO, "Write(): Couldn't delete OstModel.txt file");
                ExitProgram(1);
@@ -1794,7 +1805,7 @@ void Model::Write(double objFuncVal)
       }
       m_firstCall = false;
       //write out banner.
-      pFile = fopen(name, "a+");
+      pFile = fopen(name.data(), "a+");
       if(pFile == NULL)
       {
          LogError(ERR_FILE_IO, "Write(): Couldn't open OstModel.txt file");
@@ -1815,7 +1826,7 @@ void Model::Write(double objFuncVal)
       fclose(pFile);
    }
 
-   pFile = fopen(name, "a+");
+   pFile = fopen(name.data(), "a+");
 	fprintf(pFile, "%-4d  ", m_Counter);
 
    if(m_bMultiObjProblem == false)
@@ -1997,8 +2008,9 @@ void Model::CheckGlobalSensitivity(void)
    {
       if(prm_sum[j] <= NEARLY_ZERO)
       {
-         sprintf(tmp1, "%s appears to be insensitive and has been set to a constant value", prm_names[j]);
-         LogError(ERR_INS_PARM, tmp1);
+         std::string msg;
+         msg = std::string(prm_names[j]) +  " appears to be insensitive and has been set to a constant value";
+         LogError(ERR_INS_PARM, msg.data());
          m_pParamGroup->ExcludeParam(prm_names[j]);
       }
    }
@@ -2008,8 +2020,9 @@ void Model::CheckGlobalSensitivity(void)
    {
       if(obs_sum[i] <= NEARLY_ZERO)
       {
-         sprintf(tmp1, "%s appears to be insensitive and has been excluded from the calibration", obs_names[i]);
-         LogError(ERR_INS_OBS, tmp1);
+         std::string msg;
+         msg = std::string(obs_names[i]) + " appears to be insensitive and has been excluded from the calibration";
+         LogError(ERR_INS_OBS, msg.data());
          m_pObsGroup->ExcludeObs(obs_names[i]);
       }
    }

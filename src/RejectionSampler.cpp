@@ -12,6 +12,7 @@ Version History
 #include <math.h>
 #include <time.h>
 #include <stdlib.h>
+#include <string>
 #include <string.h>
 
 #include "RejectionSampler.h"
@@ -104,7 +105,7 @@ ComputeLikelihood()
 
 Compute the likelihood ratio using the user-selected formualtion.
 
-Stedinger formulation (from Stedinger et al. (2008) “Appraisal of the GLUE Method”): 
+Stedinger formulation (from Stedinger et al. (2008) ï¿½Appraisal of the GLUE Methodï¿½): 
    exp[n/2(1-(WSSE/WSSEmin))]
 ******************************************************************************/
 double RejectionSampler::ComputeLikelihoodRatio(double wsse)
@@ -897,8 +898,8 @@ void RejectionSampler::InitFromFile(IroncladString pFileName)
             }
 			   else 
 			   {
-			      sprintf(tmp, "Unknown Likelihood Type |%s|, defaulting to Stedinger", type);
-               LogError(ERR_FILE_IO, tmp);
+			      std::string msg = "Unknown Likelihood Type |" + std::string(type) + "|, defaulting to Stedinger";
+               LogError(ERR_FILE_IO, msg.data());
 			   }
          }/*end else if() */
          else if(strstr(line, "ShapingFactor") != NULL)
@@ -911,8 +912,8 @@ void RejectionSampler::InitFromFile(IroncladString pFileName)
          }/*end else if() */
          else
          {
-            sprintf(tmp, "Unknown token: %s", line);
-            LogError(ERR_FILE_IO, tmp);
+            std::string msg = "Unknown token: " + std::string(line);
+            LogError(ERR_FILE_IO, msg.data());
          }/* end else() */
          line = GetNxtDataLine(pFile, pFileName);
       } /* end while() */

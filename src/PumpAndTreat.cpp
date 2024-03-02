@@ -26,6 +26,7 @@ Version History
                   with abstract response variables (RespVarABC)
 03-21-05    lsm   Added support for Mayer cost formulation.
 ******************************************************************************/
+#include <string>
 #include <string.h>
 #include <math.h>
 #include <stdlib.h>
@@ -233,6 +234,7 @@ void PATO::InitFromFile(void)
    FILE * pFile;
    char * lineStr;
    char tmp1[DEF_STR_SZ], tmp2[DEF_STR_SZ];
+   std::string msg;
    IroncladString fileName = GetInFileName();
 
    pFile = fopen(fileName, "r");
@@ -269,8 +271,8 @@ void PATO::InitFromFile(void)
             { m_ObjType = PATO_OBJ_CAP_OP_TRE;}
          else
          {
-            sprintf(tmp1, "PATO::InitFromFile() invalid Cost Function: |%s|", tmp2);
-            LogError(ERR_FILE_IO, tmp1);
+            msg = "PATO::InitFromFile() invalid Cost Function: |" + std::string(tmp2) + "|";
+            LogError(ERR_FILE_IO, msg.data());
          }
       }/* end if() --> Objective Function Type */
 
@@ -287,8 +289,8 @@ void PATO::InitFromFile(void)
             { m_PenType = PEN_TYPE_EPM;}
          else
          {
-            sprintf(tmp1, "PATO::InitFromFile() invalid Penalty Function: |%s|", tmp2);
-            LogError(ERR_FILE_IO, tmp1);
+            msg = "PATO::InitFromFile() invalid Penalty Function: |" + std::string(tmp2) + "|";
+            LogError(ERR_FILE_IO, msg.data());
          }         
       }/* end else if() --> Penalty Function Type */
 
@@ -426,8 +428,8 @@ void PATO::InitFromFile(void)
 
       else
       {
-         sprintf(tmp1, "PATO::InitFromFile(): unknown token |%s|", lineStr);
-         LogError(ERR_FILE_IO, tmp1);
+         msg = "PATO::InitFromFile(): unknown token |" + std::string(lineStr) +"|";
+         LogError(ERR_FILE_IO, msg.data());
       }
 
       lineStr = GetNxtDataLine(pFile, fileName);
@@ -482,6 +484,7 @@ void PATO::InitPlumes(void)
    IroncladString fileName = GetInFileName();
    int state, i, len;
    double tmpx, tmpy;
+   std::string msg;
 
    pFile = fopen(fileName, "r");
 
@@ -553,8 +556,8 @@ void PATO::InitPlumes(void)
                }
                else
                {
-                  sprintf(tmp2, "PATO::InitPlumes() expected PlumeName, got |%s|", tmp1);
-                  LogError(ERR_FILE_IO, tmp2);
+                  msg = "PATO::InitPlumes() expected PlumeName, got |" + std::string(tmp1) +"|";
+                  LogError(ERR_FILE_IO, msg.data());
                }
                break;
             }/* end case(0) --> PlumeName */
@@ -563,8 +566,8 @@ void PATO::InitPlumes(void)
                if(strcmp(lineStr, "BeginPlumeCoords") == 0){ state = 2;}
                else
                {
-                  sprintf(tmp1, "PATO::InitPlumes() expected BeginPlumeCoords, got |%s|", lineStr);
-                  LogError(ERR_FILE_IO, tmp1);
+                  msg = "PATO::InitPlumes() expected BeginPlumeCoords, got |" + std::string(lineStr) + "|";
+                  LogError(ERR_FILE_IO, msg.data());
                }
                break;
             }/* end case(1) --> BeginPlumeCoords */
@@ -665,6 +668,7 @@ void PATO::InitConstraints(void)
    double conv, lwr, upr;
    char * lineStr, nameStr[DEF_STR_SZ], typeStr[DEF_STR_SZ];
    char tmp1[DEF_STR_SZ], tmp2[DEF_STR_SZ], tmp3[DEF_STR_SZ];
+   std::string msg;
    IroncladString fileName = GetInFileName();
 
    pFile = fopen(fileName, "r");
@@ -755,8 +759,8 @@ void PATO::InitConstraints(void)
             pLoc1 = m_pRespGroup->GetRespVarPtr(tmp1);
             if(pLoc1 == NULL)
             {
-               sprintf(typeStr, "PATO::InitConstraints() unknown response variable |%s|", tmp1);
-               LogError(ERR_FILE_IO, typeStr);
+               msg = "PATO::InitConstraints() unknown response variable |" + std::string(tmp1) + "|";
+               LogError(ERR_FILE_IO, msg.data());
                ExitProgram(1);
             }/* end if() */
             //create constraint
@@ -773,8 +777,8 @@ void PATO::InitConstraints(void)
             pLoc1 = m_pRespGroup->GetRespVarPtr(tmp1);
             if(pLoc1 == NULL)
             {
-               sprintf(typeStr, "PATO::InitConstraints() unknown response variable |%s|", tmp1);
-               LogError(ERR_FILE_IO, typeStr);
+               msg = "PATO::InitConstraints() unknown response variable |" + std::string(tmp1) + "|";
+               LogError(ERR_FILE_IO, msg.data());
                ExitProgram(1);
             }/* end if() */
             //create constraint
@@ -792,14 +796,14 @@ void PATO::InitConstraints(void)
             pLoc2 = m_pRespGroup->GetRespVarPtr(tmp2);
             if(pLoc1 == NULL)
             {
-               sprintf(typeStr, "PATO::InitConstraints() unknown response variable |%s|", tmp1);
-               LogError(ERR_FILE_IO, typeStr);
+               msg = "PATO::InitConstraints() unknown response variable |" + std::string(tmp1) + "|";
+               LogError(ERR_FILE_IO, msg.data());
                ExitProgram(1);
             }/* end if() */
             if(pLoc2 == NULL)
             {
-               sprintf(typeStr, "PATO::InitConstraints() unknown response variable |%s|", tmp2);
-               LogError(ERR_FILE_IO, typeStr);
+               msg = "PATO::InitConstraints() unknown response variable |" + std::string(tmp2) + "|";
+               LogError(ERR_FILE_IO, msg.data());
                ExitProgram(1);
             }/* end if() */
 
@@ -818,14 +822,14 @@ void PATO::InitConstraints(void)
             pLoc2 = m_pRespGroup->GetRespVarPtr(tmp2);
             if(pLoc1 == NULL)
             {
-               sprintf(typeStr, "PATO::InitConstraints() unknown response variable |%s|", tmp1);
-               LogError(ERR_FILE_IO, typeStr);
+               msg = "PATO::InitConstraints() unknown response variable |" + std::string(tmp1) + "|";
+               LogError(ERR_FILE_IO, msg.data());
                ExitProgram(1);
             }/* end if() */
             if(pLoc2 == NULL)
             {
-               sprintf(typeStr, "PATO::InitConstraints() unknown response variable |%s|", tmp2);
-               LogError(ERR_FILE_IO, typeStr);
+               msg = "PATO::InitConstraints() unknown response variable |" + std::string(tmp2) + "|";
+               LogError(ERR_FILE_IO, msg.data());
                ExitProgram(1);
             }/* end if() */
 
@@ -841,8 +845,8 @@ void PATO::InitConstraints(void)
 
             if(pPlume == NULL)
             {
-               sprintf(typeStr, "PATO::InitConstraints() unknown plume name |%s|", tmp3);
-               LogError(ERR_FILE_IO, typeStr);
+               msg = "PATO::InitConstraints() unknown plume name |" + std::string(tmp3) + "|";
+               LogError(ERR_FILE_IO, msg.data());
                ExitProgram(1);
             }/* end if() */
 
@@ -856,8 +860,8 @@ void PATO::InitConstraints(void)
          }/* end else if() ---> Particle Capture Constraint */
          else
          {
-            sprintf(nameStr, "PATO::InitConstrints() unknown type |%s|", typeStr);
-            LogError(ERR_FILE_IO, nameStr);
+            msg = "PATO::InitConstrints() unknown type |" + std::string(typeStr) + "|";
+            LogError(ERR_FILE_IO, msg.data());
          }         
          lineStr = GetNxtDataLine(pFile, fileName);
       }/* end while() --> Count Number of Plumes */
@@ -883,7 +887,8 @@ void PATO::InitWells(void)
    FILE * pFile;
    char * lineStr;
    char name[DEF_STR_SZ], xloc[DEF_STR_SZ], yloc[DEF_STR_SZ], rate[DEF_STR_SZ];
-   char head[DEF_STR_SZ], topo[DEF_STR_SZ], base[DEF_STR_SZ], msg[DEF_STR_SZ];
+   char head[DEF_STR_SZ], topo[DEF_STR_SZ], base[DEF_STR_SZ];
+   std::string msg;
 
    IroncladString fileName = GetInFileName();
    int i, len;
@@ -959,8 +964,8 @@ void PATO::InitWells(void)
          //if name not found in list, must abort program
          if( m_pWells[i].pXloc == NULL)
          {
-            sprintf(msg, "PATO::InitWells(), unknown parameter : |%s|", xloc);
-            LogError(ERR_FILE_IO, msg);
+            msg = "PATO::InitWells(), unknown parameter : |" + std::string(xloc) +"|";
+            LogError(ERR_FILE_IO, msg.data());
             ExitProgram(1);         
          }/* end if() */
 
@@ -969,8 +974,8 @@ void PATO::InitWells(void)
          //if name not found in list, must abort program
          if(m_pWells[i].pYloc == NULL)
          {
-            sprintf(msg, "PATO::InitWells(), unknown parameter : |%s|", yloc);
-            LogError(ERR_FILE_IO, msg);
+            msg = "PATO::InitWells(), unknown parameter : |" + std::string(yloc) +"|";
+            LogError(ERR_FILE_IO, msg.data());
             ExitProgram(1);         
          }/* end if() */
 
@@ -979,8 +984,8 @@ void PATO::InitWells(void)
          //if name not found in list, must abort program
          if(m_pWells[i].pQ == NULL)
          {
-            sprintf(msg, "PATO::InitWells(), unknown parameter : |%s|", rate);
-            LogError(ERR_FILE_IO, msg);
+            msg = "PATO::InitWells(), unknown parameter : |" + std::string(rate) +"|";
+            LogError(ERR_FILE_IO, msg.data());
             ExitProgram(1);         
          }/* end if() */
          m_pWells[i].pQ->SetThreshVal(-m_RateThresh, m_RateThresh, 0.00);
@@ -991,8 +996,8 @@ void PATO::InitWells(void)
             m_pWells[i].pHead = m_pRespGroup->GetRespVarPtr(head);
             if(m_pWells[i].pHead == NULL)
             {
-               sprintf(msg, "PATO::InitWells() unknown response variable |%s|", head);
-               LogError(ERR_FILE_IO, msg);
+               msg = "PATO::InitWells() unknown response variable |" + std::string(head) + "|";
+               LogError(ERR_FILE_IO, msg.data());
                ExitProgram(1);
             }/* end if() */
 
@@ -1008,8 +1013,8 @@ void PATO::InitWells(void)
                      (topo[c] != '-'))
                   {
                      //not a valid number format
-                     sprintf(msg, "PATO::InitWells() unknown response variable or invalid number format |%s|", topo);
-                     LogError(ERR_FILE_IO, msg);
+                     msg = "PATO::InitWells() unknown response variable or invalid number format |" + std::string(topo) + "|";
+                     LogError(ERR_FILE_IO, msg.data());
                      ExitProgram(1);
                   }
                }
@@ -1028,8 +1033,8 @@ void PATO::InitWells(void)
                      (base[c] != '-'))
                   {
                      //not a valid number format
-                     sprintf(msg, "PATO::InitWells() unknown response variable or invalid number format |%s|", base);
-                     LogError(ERR_FILE_IO, msg);
+                     msg = "PATO::InitWells() unknown response variable or invalid number format |" + std::string(base) +"|";
+                     LogError(ERR_FILE_IO, msg.data());
                      ExitProgram(1);
                   }
                }

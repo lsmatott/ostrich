@@ -17,6 +17,7 @@ Version History
                   model approach. Added ExcludeObs() subroutine to support the
                   "hold" observations functionality.
 ******************************************************************************/
+#include <string>
 #include <string.h>
 #include <stdlib.h>
 #include <math.h>
@@ -584,8 +585,9 @@ void ObservationGroup::InitFromFile(IroncladString obsFileName)
       //check weight, if it is zero and not part of augmented output, then ignore the observation
       if((fabs(weight) <= NEARLY_ZERO) && (bAug == false))
       {
-         sprintf(tmp1, "%s has a weight of zero and has been excluded from the calibration", tmpName);
-         LogError(ERR_BAD_WGHT, tmp1);
+         std::string msg;
+         msg = std::string(tmpName) + " has a weight of zero and has been excluded from the calibration";
+         LogError(ERR_BAD_WGHT, msg.data());
       }
       else
       {

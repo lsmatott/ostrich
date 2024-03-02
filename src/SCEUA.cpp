@@ -339,15 +339,15 @@ void SCEUA::scein
 
    // READ THE SCE CONTROL PARAMETERS
    int ideflt = 0;
-   char line[160];
-   fgets(line, 1600, pIn);
+   char line[DEF_STR_SZ];
+   fgets(line, DEF_STR_SZ, pIn);
    sscanf(line, "%d %d %lf %d %d %d", maxn, kstop, pcento, ngs, iseed, &ideflt);
    if (*iseed == 0) *iseed = 1969;
 
   //IF ideflt IS EQUAL TO 1, READ THE SCE CONTROL PARAMETERS
    if (ideflt == 1)
    {
-      fgets(line, 1600, pIn);
+      fgets(line, DEF_STR_SZ, pIn);
       sscanf(line, "%d %d %d %d %d %d", npg, nps, nspl, mings, iniflg, iprint);
       strcpy(pcntrl, usrsp);
    }
@@ -360,7 +360,7 @@ void SCEUA::scein
    int iopt;
    for(iopt = 0; iopt < nopt; iopt++)
    {
-      fgets(line, 1600, pIn);
+      fgets(line, DEF_STR_SZ, pIn);
       sscanf(line,"%lf %lf %lf", &(a[iopt]), &(bl[iopt]), &(bu[iopt]));
    }
 

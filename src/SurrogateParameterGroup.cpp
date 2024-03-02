@@ -9,6 +9,7 @@ tied to the parameters of the complex model.
 Version History
 04-06-06    lsm   added copyright information and initial comments.
 ******************************************************************************/
+#include <string>
 #include <string.h>
 #include <stdlib.h>
 
@@ -112,7 +113,7 @@ void SurrogateParameterGroup::InitTiedParams(IroncladString pFileName, Parameter
    char typeStr[DEF_STR_SZ]; //type of realtionship (linear, exp, or log)
    char * lineStr;
    char tmpStr[DEF_STR_SZ];
-   char msg[DEF_STR_SZ];
+   std::string msg;
    bool invalidNumParams;
       
    pFile = fopen(pFileName, "r");
@@ -176,8 +177,8 @@ void SurrogateParameterGroup::InitTiedParams(IroncladString pFileName, Parameter
          pParams[n] = pComplex->GetMetaParam(tmpStr);
          if(pParams[n].pParam == NULL)
          {
-            sprintf(msg, "InitTiedParams(): unknown parameter |%s|", tmpStr);
-            LogError(ERR_FILE_IO, msg);
+            msg = "InitTiedParams(): unknown parameter |" + std::string( tmpStr ) +"|";
+            LogError(ERR_FILE_IO, msg.data());
             ExitProgram(1);
          }         
       }/* end for() */
@@ -244,8 +245,8 @@ void SurrogateParameterGroup::InitTiedParams(IroncladString pFileName, Parameter
       }
       else
       {
-         sprintf(msg, "InitTiedParams(): unknown relationship type |%s|", typeStr);
-         LogError(ERR_FILE_IO, msg);
+         msg = "InitTiedParams(): unknown relationship type |" + std::string(typeStr) +"|";
+         LogError(ERR_FILE_IO, msg.data());
          ExitProgram(1);
       }
 
@@ -255,8 +256,8 @@ void SurrogateParameterGroup::InitTiedParams(IroncladString pFileName, Parameter
       */
       if(invalidNumParams == true)
       {
-         sprintf(msg, "InitTiedParams(): invalid # of params (%d) for type (%s)", np, typeStr);
-         LogError(ERR_FILE_IO, msg);
+         msg = "InitTiedParams(): invalid # of params (" + std::to_string(np) + ") for type (" + std::string(typeStr) + ")";
+         LogError(ERR_FILE_IO, msg.data());
          ExitProgram(1);
       }
 
@@ -297,7 +298,7 @@ void SurrogateParameterGroup::CheckTemplateFiles(FilePair * pList)
    FilePair * pCur;
    FilePipe * pPipe;
    UnchangeableString name;
-   char msg[DEF_STR_SZ];
+   std::string msg;
    int i;
    bool found;
 
@@ -319,8 +320,8 @@ void SurrogateParameterGroup::CheckTemplateFiles(FilePair * pList)
       }
       if(found == false)
       {
-         sprintf(msg, "Parameter |%s| not found in any template file", name);
-         LogError(ERR_FILE_IO, msg);
+         msg= "Parameter |" + std::string(name) + "| not found in any template file";
+         LogError(ERR_FILE_IO, msg.data());
       }
    }
 

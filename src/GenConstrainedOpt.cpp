@@ -17,6 +17,7 @@ which are functions of model output and/or model parameters.
 Version History
 01-10-05    lsm   created
 ******************************************************************************/
+#include <string>
 #include <string.h>
 #include <math.h>
 #include <stdlib.h>
@@ -185,8 +186,8 @@ void GCOP::InitFromFile(void)
             { m_PenType = PEN_TYPE_EPM;}
          else
          {
-            sprintf(tmp1, "GCOP::InitFromFile() invalid Penalty Function: |%s|", tmp2);
-            LogError(ERR_FILE_IO, tmp1);
+            std::string msg = "GCOP::InitFromFile() invalid Penalty Function: |" + std::string(tmp2) +"|";
+            LogError(ERR_FILE_IO, msg.data());
          }         
       }/* end if() --> Penalty Function Type */
 
@@ -202,16 +203,16 @@ void GCOP::InitFromFile(void)
          }         
          if(m_pMultiObjCostFunc[whichObj] == NULL)
          {
-            sprintf(tmp1, "GCOP::InitFromFile(): CostFunction |%s| is not a response variable", costStr);
-            LogError(ERR_FILE_IO, tmp1);
+            std::string msg = "GCOP::InitFromFile(): CostFunction |" + std::string(costStr) + "| is not a response variable";
+            LogError(ERR_FILE_IO, msg.data());
             ExitProgram(1);
          }
          whichObj++;
       }/* end if() --> Cost Function */
       else
       {
-         sprintf(tmp1, "GCOP::InitFromFile(): unknown token |%s|", lineStr);
-         LogError(ERR_FILE_IO, tmp1);
+         std::string msg = "GCOP::InitFromFile(): unknown token |" + std::string(lineStr) + "|";
+         LogError(ERR_FILE_IO, msg.data());
       }
 
       lineStr = GetNxtDataLine(pFile, fileName);
@@ -363,8 +364,8 @@ void GCOP::InitConstraints(void)
             pLoc1 = m_pRespGroup->GetRespVarPtr(tmp1);
             if(pLoc1 == NULL)
             {
-               sprintf(typeStr, "GCOP::InitConstraints() unknown response variable |%s|", tmp1);
-               LogError(ERR_FILE_IO, typeStr);
+               std::string msg = "GCOP::InitConstraints() unknown response variable |" + std::string(tmp1) + "|";
+               LogError(ERR_FILE_IO, msg.data());
                ExitProgram(1);
             }/* end if() */
             //create constraint
@@ -377,8 +378,8 @@ void GCOP::InitConstraints(void)
          }/* end else if() ---> General Constraint */
          else
          {
-            sprintf(nameStr, "GCOP::InitConstrints() unknown type |%s|", typeStr);
-            LogError(ERR_FILE_IO, nameStr);
+            std::string msg = "GCOP::InitConstrints() unknown type |" + std::string(typeStr) + "|";
+            LogError(ERR_FILE_IO, msg.data());
          }         
          lineStr = GetNxtDataLine(pFile, fileName);
       }/* end while() --> read in constraints */
@@ -493,21 +494,21 @@ int GCOP::CalcMultiObjFunc(double * pF, int nObj)
    double penalty = 0.00;
    int whichObj;
    ConstraintABC * pCur;
-   char outfileName[DEF_STR_SZ];
+   std::string outfileName;
    
    m_pRespGroup->ExtractVals();
 
    for(whichObj = 0; whichObj < nObj; whichObj++)
    {    
-      sprintf(outfileName, "OstGcopOut_%s.txt", m_pMultiObjCostFunc[whichObj]->GetName());
+      outfileName = "OstGcopOut_" + std::string(m_pMultiObjCostFunc[whichObj]->GetName()) + ".txt";
       if(firstTime == true)
       {
-         pFile = fopen(outfileName, "w");
+         pFile = fopen(outfileName.data(), "w");
          fprintf(pFile, "True Cost \tPenalty \tAdjusted Cost\n");         
       }
       else
       { 
-         pFile = fopen(outfileName, "a+");
+         pFile = fopen(outfileName.data(), "a+");
       }
 
       //compute and output the un-penalized cost
