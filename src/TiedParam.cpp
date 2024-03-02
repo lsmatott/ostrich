@@ -202,7 +202,7 @@ void TiedParamLin1::Write(FILE * pFile, int type)
    {
       fprintf(pFile,"%-12s  ", m_pName);
    }/* end else() */
-} /* end TiedParamLin1::WriteToFile() */
+} /* end TiedParamLin1::Write() */
 
 /******************************************************************************
 TiedParamLin2::Destroy()
@@ -360,7 +360,7 @@ void TiedParamLin2::Write(FILE * pFile, int type)
    {
       fprintf(pFile,"%-12s  ", m_pName);
    }/* end else() */
-} /* end TiedParamLin2::WriteToFile() */
+} /* end TiedParamLin2::Write() */
 
 
 
@@ -696,7 +696,7 @@ void TiedParamExp::Write(FILE * pFile, int type)
    {
       fprintf(pFile,"%-12s  ", m_pName);
    }/* end else() */
-} /* end TiedParamExp::WriteToFile() */
+} /* end TiedParamExp::Write() */
 
 /******************************************************************************
 TiedParamLog::Destroy()
@@ -871,7 +871,7 @@ void TiedParamLog::Write(FILE * pFile, int type)
    {
       fprintf(pFile,"%-12s  ", m_pName);
    }/* end else() */
-} /* end TiedParamLog::WriteToFile() */
+} /* end TiedParamLog::Write() */
 
 /******************************************************************************
 TiedDistXY::Destroy()
@@ -1020,7 +1020,7 @@ void TiedDistXY::Write(FILE * pFile, int type)
    {
       fprintf(pFile,"%-12s  ", m_pName);
    }/* end else() */
-} /* end TiedDistXY::WriteToFile() */
+} /* end TiedDistXY::Write() */
 
 /******************************************************************************
 TiedParamSimpleRatio::Destroy()
@@ -1181,7 +1181,7 @@ void TiedParamSimpleRatio::Write(FILE * pFile, int type)
    {
       fprintf(pFile,"%-12s  ", m_pName);
    }/* end else() */
-} /* end TiedParamSimpleRatio::WriteToFile() */
+} /* end TiedParamSimpleRatio::Write() */
 
 /******************************************************************************
 TiedParamComplexRatio::Destroy()
@@ -1368,7 +1368,7 @@ void TiedParamComplexRatio::Write(FILE * pFile, int type)
    {
       fprintf(pFile,"%-12s  ", m_pName);
    }/* end else() */
-} /* end TiedParamComplexRatio::WriteToFile() */
+} /* end TiedParamComplexRatio::Write() */
 
 /******************************************************************************
 TiedParamConstant::Destroy()
@@ -1377,6 +1377,7 @@ void TiedParamConstant::Destroy(void)
 {
    delete [] m_pName;
    delete [] m_pFixFmt;
+   delete [] m_pStringLiteral;
    IncDtorCount();
 } /* end Destroy() */
 
@@ -1387,6 +1388,7 @@ TiedParamConstant::TiedParamConstant(void)
 {
    m_pName = NULL;
    m_pFixFmt = NULL;
+   m_pStringLiteral = NULL;
    m_val = 0.00;
    IncCtorCount();
 } /* end default CTOR */
@@ -1410,18 +1412,28 @@ TiedParamConstant::TiedParamConstant(IroncladString name, UnmoveableString pVal)
    //parse the config string to determine value of constant
    pTok = pVal;
    j = ExtractString(pTok, tmpStr);
-   m_val = atof(tmpStr);
-   //extract fortran formatting
-   m_pFixFmt = new char[len];
-   pTok += j;   
-   strcpy(m_pFixFmt, pTok);
-   MyTrim(m_pFixFmt);
-   //check fixed format setting
-   char valStr[DEF_STR_SZ];
-   bool bOk;
-   bOk = GetFixedFormatValAsStr(valStr, 0.00, m_pFixFmt);
-   if(!bOk) strcpy(m_pFixFmt, "free");
-
+   //check for string literal
+   if(((tmpStr[0] == '"') && (tmpStr[strlen(tmpStr)-1] == '"')) ||
+      ((tmpStr[0] == '\'') && (tmpStr[strlen(tmpStr) - 1] == '\'')))
+   {
+      m_pStringLiteral = new char[strlen(tmpStr)];
+      strcpy(m_pStringLiteral, &(tmpStr[1]));
+      m_pStringLiteral[strlen(tmpStr) - 2] = NULLSTR;
+   }
+   else
+   {
+      m_val = atof(tmpStr);
+      //extract fortran formatting
+      m_pFixFmt = new char[len];
+      pTok += j;   
+      strcpy(m_pFixFmt, pTok);
+      MyTrim(m_pFixFmt);
+      //check fixed format setting
+      char valStr[DEF_STR_SZ];
+      bool bOk;
+      bOk = GetFixedFormatValAsStr(valStr, 0.00, m_pFixFmt);
+      if(!bOk) strcpy(m_pFixFmt, "free");
+   }
    IncCtorCount();
 } /* end CTOR */
 
@@ -1430,19 +1442,26 @@ TiedParamConstant::GetValAsStr()
 ******************************************************************************/
 void TiedParamConstant::GetValAsStr(UnmoveableString valStr)
 {
-   bool bOk;
-   double val = GetEstimatedValueTransformed();
-   char * fmt = m_pFixFmt;
-   if(strcmp(fmt, "free") == 0)
-   {
-      GetPreciseValAsStr(valStr, val);
-   }
-   else
-   {
-      bOk = GetFixedFormatValAsStr(valStr, val, fmt);
-      if(!bOk)
+  if(m_pStringLiteral != NULL)
+  {
+     strcpy(valStr, m_pStringLiteral);
+  }
+  else
+  {
+      bool bOk;
+      double val = GetEstVal();
+      char * fmt = m_pFixFmt;
+      if(strcmp(fmt, "free") == 0)
       {
          GetPreciseValAsStr(valStr, val);
+      }
+      else
+      {
+         bOk = GetFixedFormatValAsStr(valStr, val, fmt);
+         if(!bOk)
+         {
+            GetPreciseValAsStr(valStr, val);
+         }
       }
    }
 }/* end TiedParamConstant::GetValAsStr() */
@@ -1470,16 +1489,37 @@ void TiedParamConstant::Write(FILE * pFile, int type)
 
    if(type == WRITE_SCI)
    {
-      fprintf(pFile,"%E  ", val);
+      if(m_pStringLiteral != NULL)
+      {
+         fprintf(pFile, "%-12s  ", m_pStringLiteral);
+      }
+      else
+      {
+         fprintf(pFile,"%E  ", val);
+      }
    }
    else if (type == WRITE_DEC)
    {
-      fprintf(pFile,"%.6lf  ", val);
+      if (m_pStringLiteral != NULL)
+      {
+         fprintf(pFile, "%-12s  ", m_pStringLiteral);
+      }
+      else
+      {
+         fprintf(pFile,"%.6lf  ", val);
+      }
    }
    else if (type == WRITE_DBG)
    {
       fprintf(pFile, "Name = %s\n", m_pName);
-      fprintf(pFile, "Value = %lf\n", val);
+      if (m_pStringLiteral != NULL)
+      {
+         fprintf(pFile, "Value = %s\n", m_pStringLiteral);
+      }
+      else
+      {
+         fprintf(pFile, "Value = %lf\n", val);
+      }
    }/* end else if() */
    else if (type == WRITE_TX_BNR)
    {
@@ -1487,13 +1527,20 @@ void TiedParamConstant::Write(FILE * pFile, int type)
    }/* end else() */
    else if (type == WRITE_OPT)
    {
-      fprintf(pFile, "%-18s : %E\n", m_pName, val);
+      if (m_pStringLiteral != NULL)
+      {
+         fprintf(pFile, "%-18s : %s\n", m_pName, m_pStringLiteral);
+      }
+      else
+      {
+         fprintf(pFile, "%-18s : %E\n", m_pName, val);
+      }
    }
    else // assuming (type == WRITE_BNR)
    {
       fprintf(pFile,"%-12s  ", m_pName);
    }/* end else() */
-} /* end TiedParamConstant::WriteToFile() */
+} /* end TiedParamConstant::Write() */
 
 /******************************************************************************
 TiedParamWsum::Destroy()
@@ -1660,4 +1707,4 @@ void TiedParamWsum::Write(FILE * pFile, int type)
    {
       fprintf(pFile,"%-12s  ", m_pName);
    }/* end else() */
-} /* end TiedParamWsum::WriteToFile() */
+} /* end TiedParamWsum::Write() */

@@ -18,39 +18,21 @@ MEM_FILES_C	:= $(wildcard $(MPI_MEM_SRC)/*.c)
 all:
 	-@ echo ""
 	-@ echo "Must specify a target"
-	-@ echo "   ICC : Serial compile with Intel compiler stack"
 	-@ echo "   GCC : Serial compile with GCC compiler stack"
-	-@ echo "   ICC_MPI : MPI compile with Intel compiler stack"
+	-@ echo "   GCC_DBG : Serial compile with GCC compiler stack and debug symbols"
 	-@ echo "   GCC_MPI : MPI compile with GCC compiler stack"
-	-@ echo "   GCC_DB : Serial compile with GCC compiler stack with disk based MPI"
-	-@ echo "   ICC_DB : Serial compile with Intel compiler stack with disk based MPI"
 	-@ echo ""
 
-
-ICC_MPI:	$(SRC_FILES_CPP) $(SRC_FILES_C)
-	mpiicpc -std=c++17 -I$(INCLUDE_DIR) $(SRC_FILES_CPP) -o OstrichMPI
+GCC_DBG:    $(SRC_FILES_CPP) $(SRC_FILES_C)
+	g++ -g -std=c++17 -DUSE_MPI_STUB -I$(INCLUDE_DIR) -I$(MPI_MEM_INCLUDE) $(SRC_FILES_CPP) $(MEM_FILES_C) -ldl -lstdc++fs -o Ostrich
 	rm -f *.o
 
 GCC_MPI:	$(SRC_FILES_CPP) $(SRC_FILES_C)
-	mpic++ -I$(INCLUDE_DIR) $(SRC_FILES_CPP) -std=c++17 -lstdc++fs -o OstrichMPI
-	rm -f *.o
-
-ICC:	$(SRC_FILES_CPP) $(SRC_FILES_C)
-	icc  -std=c++17 -I$(INCLUDE_DIR) -I$(MPI_MEM_INCLUDE) $(SRC_FILES_CPP) $(MEM_FILES_C) -o Ostrich
+	mpigxx -std=c++17 -I$(INCLUDE_DIR) $(SRC_FILES_CPP) -ldl -lstdc++fs -o OstrichMPI 
 	rm -f *.o
 
 GCC:	$(SRC_FILES_CPP) $(SRC_FILES_C)
-	g++ -I$(INCLUDE_DIR) -I$(MPI_MEM_INCLUDE) $(SRC_FILES_CPP) $(MEM_FILES_C) -std=c++17 -lstdc++fs -o Ostrich
-
-	rm -f *.o
-
-
-GCC_DB:	$(SRC_FILES_CPP) $(SRC_FILES_C)
-	g++ -I$(INCLUDE_DIR) -I$(MPI_DISK_INCLUDE) $(SRC_FILES_CPP) $(DISK_FILES_C) -std=c++17 -o OstrichDB
-	rm -f *.o
-
-ICC_DB:	$(SRC_FILES_CPP) $(SRC_FILES_C)
-	icc -std=c++17 -I$(INCLUDE_DIR) -I$(MPI_DISK_INCLUDE) $(SRC_FILES_CPP) $(DISK_FILES_C) -o OstrichDB
+	g++ -std=c++17 -DUSE_MPI_STUB -I$(INCLUDE_DIR) -I$(MPI_MEM_INCLUDE) $(SRC_FILES_CPP) $(MEM_FILES_C) -ldl -lstdc++fs -o Ostrich
 	rm -f *.o
 
 clean:

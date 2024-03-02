@@ -41,6 +41,7 @@ class FileList;
 class DatabaseABC;
 class SurrogateParameterGroup;
 class ParameterCorrection;
+class ParamInitializerABC;
 
 /******************************************************************************
 class Model
@@ -50,26 +51,28 @@ class Model : public ModelABC
 {
    public:
      Model(void);
-	 ~Model(void){ DBG_PRINT("Model::DTOR"); Destroy(); }
+     ~Model(void){ DBG_PRINT("Model::DTOR"); Destroy(); }
      void Destroy(void);
           
      //retrieve member variables
      ObservationGroup *  GetObsGroupPtr(void);
      ParameterGroup   *  GetParamGroupPtr(void);     
      ObjectiveFunction * GetObjFuncPtr(void);
-     double GetObjectiveFunctionValue(void) { return m_CurObjFuncVal;}
+     ParamInitializerABC * GetParamInitializerPtr(void);
+     double GetObjFuncVal(void) { return m_CurObjFuncVal;}
      void SetObjFuncVal(double curVal) { m_CurObjFuncVal = curVal;}
      int GetCounter(void);
      void SetCounter(int count);
      ObjFuncType GetObjFuncId(void) {return m_ObjFuncId;}
-	 UnchangeableString GetObjFuncStr(void);
+     UnchangeableString GetObjFuncStr(void);
      UnchangeableString GetModelStr(void){return m_ExecCmd;}
-	 void PerformParameterCorrections(void);
+     void PerformParameterCorrections(void);
      //misc. member functions     
      double Execute(void);
      double Execute(double viol); //include parameter bounds violations in the objective function
      void Execute(double * pF, int nObj);
      void   CheckGlobalSensitivity(void);
+     void   ExcludeConstantParameters(void);
      void   Write(double objFuncVal);
      void   WriteMetrics(FILE * pFile);
      void   Bookkeep(bool bFinal);
@@ -87,9 +90,10 @@ class Model : public ModelABC
       ParameterGroup    * m_pParamGroup;
       DecisionModule    * m_pDecision;
       ParameterCorrection * m_pParameterCorrection;
+      ParamInitializerABC * m_pParamInitializer;
       TelescopeType m_Telescope; //telescoping bounds strategy
 
-	   DatabaseABC * m_DbaseList;
+      DatabaseABC * m_DbaseList;
       FilePair * m_FileList;
       int m_Counter;
       int m_NumCacheHits;
@@ -102,7 +106,8 @@ class Model : public ModelABC
       bool m_InternalModel;
       bool m_bCheckGlobalSens;
       bool m_bUseSurrogates;
-      bool m_bSave;
+      bool m_bTryFileCleanup;
+      bool m_bPreserveModelOutput;
       bool m_bWarmStart;
       bool m_bCaching;
       bool m_bPreserveModelOutput;
@@ -142,7 +147,8 @@ class SurrogateModel : public ModelABC
      ObservationGroup *  GetObsGroupPtr(void);
      ParameterGroup   *  GetParamGroupPtr(void) { return NULL;}
      ObjectiveFunction * GetObjFuncPtr(void);
-     double GetObjectiveFunctionValue(void) { return m_CurObjFuncVal;}
+     ParamInitializerABC * GetParamInitializerPtr(void) { return NULL;}
+     double GetObjFuncVal(void) { return m_CurObjFuncVal;}
      void SetObjFuncVal(double curVal) { m_CurObjFuncVal = curVal;}
      int                 GetCounter(void);
      ObjFuncType GetObjFuncId(void) {return m_ObjFuncId;}

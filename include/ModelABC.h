@@ -17,6 +17,7 @@ Version History
 class ObservationGroup;
 class ObjectiveFunction;
 class ParameterGroup;
+class ParamInitializerABC;
 
 /******************************************************************************
 class ModelABC
@@ -31,7 +32,8 @@ class ModelABC
       virtual ObservationGroup * GetObsGroupPtr(void) = 0;
       virtual ParameterGroup *  GetParamGroupPtr(void) = 0;
       virtual ObjectiveFunction * GetObjFuncPtr(void) = 0;
-      virtual double GetObjectiveFunctionValue(void) = 0;
+      virtual ParamInitializerABC * GetParamInitializerPtr(void) = 0;
+      virtual double GetObjFuncVal(void) = 0;
       virtual void SetObjFuncVal(double curVal) = 0;
       virtual int GetCounter(void) = 0;
       virtual ObjFuncType GetObjFuncId(void) = 0;

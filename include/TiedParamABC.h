@@ -305,6 +305,7 @@ class TiedParamConstant : public TiedParamABC
    private:
       StringType m_pName;
       StringType m_pFixFmt;
+      StringType m_pStringLiteral;
       double m_val;
 }; /* end class TiedParamConstant */
 

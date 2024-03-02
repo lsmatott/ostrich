@@ -1,3 +1,19 @@
+# binaries
+bin
+
+# Visual Studio .vs folders
+VC_Ostrich/VC_Ostrich/.vs
+VC_Ostrich/VC_OstrichMPI/.vs
+
+# Visual Studio build output
+VC_Ostrich/VC_OstrichMPI/x64/Debug
+VC_Ostrich/VC_OstrichMPI/x64/Release
+VC_Ostrich/VC_Ostrich/x64/Debug
+VC_Ostrich/VC_Ostrich/x64/Release
+
+#MS MPI
+extern/msmpi/
+
 # Prerequisites
 *.d
 
@@ -31,6 +47,19 @@
 *.out
 *.app
 make/Ostrich
+make/OstrichMPI
+
+# make logs
+make/*.log
 
 # MacOS files
 **.DS_Store
+src/compare_ostrich_distributions.sh
+src/ignore_these_changed_files.txt
+src/list_of_changed_files.txt
+include/compare_ostrich_distributions.sh
+include/list_of_changed_files.txt
+
+# vs code files
+.vscode
+

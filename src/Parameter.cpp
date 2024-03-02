@@ -263,7 +263,7 @@ void RealParam::Write(FILE * pFile, int type)
    {
       fprintf(pFile,"%-12s  ", m_pName);
    }/* end else() */
-} /* end RealParam::WriteToFile() */
+} /* end RealParam::Write() */
 
 /******************************************************************************
 RealParam::GetValAsStr()
@@ -400,42 +400,4 @@ void IntParam::Write(FILE * pFile, int type)
    {
       fprintf(pFile,"%-12s  ", m_pName);
    }/* end else() */
-} /* end IntParam::WriteToFile() */
-
-
-/******************************************************************************
-IntParam::ConvertOutVal()
-
-Converts the input value based on users choice of output style.
-******************************************************************************/
-double IntParam::ConvertOutVal(double val)
-{
-    switch (m_TransID[TX_OST])
-    {
-    case(TX_NONE):
-        switch (m_TransID[TX_OUT])
-        {
-        case(TX_NONE): return val;
-        case(TX_LOG10): return log10(val);
-        case(TX_LN): return log(val);
-        default: return 0.00;
-        }/* end switch () */
-    case(TX_LOG10):
-        switch (m_TransID[TX_OUT])
-        {
-        case(TX_NONE): return pow(10, val);
-        case(TX_LOG10): return val;
-        case(TX_LN): return log(pow(10, val));
-        default: return 0.00;
-        }/* end switch () */
-    case(TX_LN):
-        switch (m_TransID[TX_OUT])
-        {
-        case(TX_NONE): return exp(val);
-        case(TX_LOG10): return log10(exp(val));
-        case(TX_LN): return val;
-        default: return 0.00;
-        }/* end switch () */
-    default: return 0.00;
-    }/* end switch () */
-} /* end RealParam::ConvertOutVal() */
+} /* end IntParam::Write() */

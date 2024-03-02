@@ -54,7 +54,7 @@ typedef struct ERROR_MSG_STRUCT
 }ErrorMsg;
 
 /* maximum number of errors that can be logged (to prevent memory overflow) */
-#define MAX_ERRORS (100)
+#define MAX_ERRORS (1000)
 
 /*
 A mapping between error enums and human readable strings.
@@ -491,7 +491,12 @@ void LogError(ErrorCodeType err, IroncladString msg)
          pErr = pErr->pNxt;
       }/* end if() */
 
-      strcpy(pErr->errMsg, msg);
+      strncpy(pErr->errMsg, msg, DEF_STR_SZ);
+      // log messages are constrained to be no longer than DEF_STR_SZ
+      if(strlen(msg) > DEF_STR_SZ) 
+      {
+         pErr->errMsg[DEF_STR_SZ-1] = NULLSTR;
+      }
       pErr->errCode = err;
       pErr->pNxt = NULL;
    }/* end if() */

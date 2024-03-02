@@ -1,0 +1,358 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>16.0</VCProjectVersion>
+    <Keyword>Win32Proj</Keyword>
+    <ProjectGuid>{4573b01f-ab56-4e1a-967c-b2d7c2626ffd}</ProjectGuid>
+    <RootNamespace>VCOstrichMPI</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>$(ProjectDir)\..\..\extern\msmpi\include;$(ProjectDir)\..\..\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>$(ProjectDir)\..\..\extern\msmpi\Lib\x64</AdditionalLibraryDirectories>
+      <AdditionalDependencies>msmpi.lib;$(CoreLibraryDependencies);%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+    <PostBuildEvent>
+      <Command>copy $(SolutionDir)$(Platform)\$(Configuration)\VC_OstrichMPI.exe C:\Matott\Work\ostrich-swmm\Ostrich\bin\OstrichDebugMPI.exe</Command>
+      <Message>Copying OstrichMPI.exe to bin folder</Message>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>$(ProjectDir)\..\..\extern\msmpi\include;$(ProjectDir)\..\..\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>$(ProjectDir)\..\..\extern\msmpi\Lib\x64</AdditionalLibraryDirectories>
+      <AdditionalDependencies>msmpi.lib;$(CoreLibraryDependencies);%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+    <PostBuildEvent>
+      <Command>copy $(SolutionDir)$(Platform)\$(Configuration)\VC_OstrichMPI.exe C:\Matott\Work\ostrich-swmm\Ostrich\bin\OstrichMPI.exe</Command>
+      <Message>Copying OstrichMPI.exe to bin folder</Message>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\src\AccessConverter.cpp" />
+    <ClCompile Include="..\..\src\ADOConnection.cpp" />
+    <ClCompile Include="..\..\src\AdvancedKinniburgh.cpp" />
+    <ClCompile Include="..\..\src\AdvancedKinniburghSolver.cpp" />
+    <ClCompile Include="..\..\src\APPSO.cpp" />
+    <ClCompile Include="..\..\src\BEERS.cpp" />
+    <ClCompile Include="..\..\src\BinaryGA.cpp" />
+    <ClCompile Include="..\..\src\BinaryGene.cpp" />
+    <ClCompile Include="..\..\src\BisectionAlgorithm.cpp" />
+    <ClCompile Include="..\..\src\BoxCoxModel.cpp" />
+    <ClCompile Include="..\..\src\CapacityConstraint.cpp" />
+    <ClCompile Include="..\..\src\Chromosome.cpp" />
+    <ClCompile Include="..\..\src\ChromosomeCommunicator.cpp" />
+    <ClCompile Include="..\..\src\ChromosomePool.cpp" />
+    <ClCompile Include="..\..\src\ComboParam.cpp" />
+    <ClCompile Include="..\..\src\ComboSA.cpp" />
+    <ClCompile Include="..\..\src\DDSAlgorithm.cpp" />
+    <ClCompile Include="..\..\src\DDSAU.cpp" />
+    <ClCompile Include="..\..\src\DecisionModule.cpp" />
+    <ClCompile Include="..\..\src\DiscreteDDSAlgorithm.cpp" />
+    <ClCompile Include="..\..\src\DrawdownConstraint.cpp" />
+    <ClCompile Include="..\..\src\Exception.cpp" />
+    <ClCompile Include="..\..\src\FileList.cpp" />
+    <ClCompile Include="..\..\src\FilePair.cpp" />
+    <ClCompile Include="..\..\src\FilePipe.cpp" />
+    <ClCompile Include="..\..\src\FletchReevesAlgorithm.cpp" />
+    <ClCompile Include="..\..\src\FortranSupportUtilities.cpp" />
+    <ClCompile Include="..\..\src\GenConstrainedOpt.cpp" />
+    <ClCompile Include="..\..\src\Gene.cpp" />
+    <ClCompile Include="..\..\src\GeneralConstraint.cpp" />
+    <ClCompile Include="..\..\src\GeneticAlgorithm.cpp" />
+    <ClCompile Include="..\..\src\GeometryUtility.cpp" />
+    <ClCompile Include="..\..\src\GeomParam.cpp" />
+    <ClCompile Include="..\..\src\GLUE.cpp" />
+    <ClCompile Include="..\..\src\GridAlgorithm.cpp" />
+    <ClCompile Include="..\..\src\HydGradConstraint.cpp" />
+    <ClCompile Include="..\..\src\Interpolator.cpp" />
+    <ClCompile Include="..\..\src\IsoFit.cpp" />
+    <ClCompile Include="..\..\src\IsoParse.cpp" />
+    <ClCompile Include="..\..\src\Isotherms.cpp" />
+    <ClCompile Include="..\..\src\Kinniburgh.cpp" />
+    <ClCompile Include="..\..\src\KinniburghSolver.cpp" />
+    <ClCompile Include="..\..\src\KMeans_1601.cpp" />
+    <ClCompile Include="..\..\src\LatinHypercube.cpp" />
+    <ClCompile Include="..\..\src\LevenbergAlgorithm.cpp" />
+    <ClCompile Include="..\..\src\McCammon.cpp" />
+    <ClCompile Include="..\..\src\McCammonSolver.cpp" />
+    <ClCompile Include="..\..\src\MemoryTracker.cpp" />
+    <ClCompile Include="..\..\src\Model.cpp" />
+    <ClCompile Include="..\..\src\ModelBackup.cpp" />
+    <ClCompile Include="..\..\src\MOPSOCD_Algorithm.cpp" />
+    <ClCompile Include="..\..\src\MOPSOCD_RandomLib.cpp" />
+    <ClCompile Include="..\..\src\MyDebug.cpp" />
+    <ClCompile Include="..\..\src\MyErf.cpp" />
+    <ClCompile Include="..\..\src\NetCDFConverter.cpp" />
+    <ClCompile Include="..\..\src\NSGAII_Algorithm.cpp" />
+    <ClCompile Include="..\..\src\ObjectiveFunction.cpp" />
+    <ClCompile Include="..\..\src\Observation.cpp" />
+    <ClCompile Include="..\..\src\ObservationGroup.cpp" />
+    <ClCompile Include="..\..\src\OptMathClass.cpp" />
+    <ClCompile Include="..\..\src\OptSearchClass.cpp" />
+    <ClCompile Include="..\..\src\Orear.cpp" />
+    <ClCompile Include="..\..\src\OrearSolver.cpp" />
+    <ClCompile Include="..\..\src\Ostrich.cpp" />
+    <ClCompile Include="..\..\src\PADDS.cpp" />
+    <ClCompile Include="..\..\src\PAES_Algorithm.cpp" />
+    <ClCompile Include="..\..\src\PAES_Genetics.cpp" />
+    <ClCompile Include="..\..\src\PAES_Helpers.cpp" />
+    <ClCompile Include="..\..\src\PAES_ObjFunc.cpp" />
+    <ClCompile Include="..\..\src\Parameter.cpp" />
+    <ClCompile Include="..\..\src\ParameterCorrection.cpp" />
+    <ClCompile Include="..\..\src\ParameterGroup.cpp" />
+    <ClCompile Include="..\..\src\ParamInitializerHamed.cpp" />
+    <ClCompile Include="..\..\src\ParamInitializerKMeans.cpp" />
+    <ClCompile Include="..\..\src\ParaPADDS.cpp" />
+    <ClCompile Include="..\..\src\ParticleCaptureConstraint.cpp" />
+    <ClCompile Include="..\..\src\ParticleSwarm.cpp" />
+    <ClCompile Include="..\..\src\PDDSAlgorithm.cpp" />
+    <ClCompile Include="..\..\src\PowellAlgorithm.cpp" />
+    <ClCompile Include="..\..\src\PumpAndTreat.cpp" />
+    <ClCompile Include="..\..\src\QuadTree.cpp" />
+    <ClCompile Include="..\..\src\RejectionSampler.cpp" />
+    <ClCompile Include="..\..\src\ResponseVar.cpp" />
+    <ClCompile Include="..\..\src\ResponseVarGroup.cpp" />
+    <ClCompile Include="..\..\src\SAAlgorithm.cpp" />
+    <ClCompile Include="..\..\src\SamplingAlgorithm.cpp" />
+    <ClCompile Include="..\..\src\SCEUA.cpp" />
+    <ClCompile Include="..\..\src\SMOOTH.cpp" />
+    <ClCompile Include="..\..\src\SpecialParam.cpp" />
+    <ClCompile Include="..\..\src\StatsClass.cpp" />
+    <ClCompile Include="..\..\src\StatUtility.cpp" />
+    <ClCompile Include="..\..\src\SteepDescAlgorithm.cpp" />
+    <ClCompile Include="..\..\src\SuperMUSE.cpp" />
+    <ClCompile Include="..\..\src\SuperMuseUtility.cpp" />
+    <ClCompile Include="..\..\src\SurrogateDbase.cpp" />
+    <ClCompile Include="..\..\src\SurrogateModel.cpp" />
+    <ClCompile Include="..\..\src\SurrogateParameterGroup.cpp" />
+    <ClCompile Include="..\..\src\TelescopingBounds.cpp" />
+    <ClCompile Include="..\..\src\TiedParam.cpp" />
+    <ClCompile Include="..\..\src\TiedRespVar.cpp" />
+    <ClCompile Include="..\..\src\Utility.cpp" />
+    <ClCompile Include="..\..\src\ValueExtractor.cpp" />
+    <ClCompile Include="..\..\src\VandSA.cpp" />
+    <ClCompile Include="..\..\src\VARS_Algorithm.cpp" />
+    <ClCompile Include="..\..\src\VertexList.cpp" />
+    <ClCompile Include="..\..\src\WriteUtility.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\include\AccessConverter.h" />
+    <ClInclude Include="..\..\include\ADOConnection.h" />
+    <ClInclude Include="..\..\include\AdvancedKinniburghSolver.h" />
+    <ClInclude Include="..\..\include\AlgorithmABC.h" />
+    <ClInclude Include="..\..\include\APPSO.h" />
+    <ClInclude Include="..\..\include\BEERS.h" />
+    <ClInclude Include="..\..\include\BinaryGA.h" />
+    <ClInclude Include="..\..\include\BisectionAlgorithm.h" />
+    <ClInclude Include="..\..\include\BoxCoxModel.h" />
+    <ClInclude Include="..\..\include\Chromosome.h" />
+    <ClInclude Include="..\..\include\ChromosomeCommunicator.h" />
+    <ClInclude Include="..\..\include\ChromosomePool.h" />
+    <ClInclude Include="..\..\include\ComboSA.h" />
+    <ClInclude Include="..\..\include\ConstraintABC.h" />
+    <ClInclude Include="..\..\include\ConversionTool.h" />
+    <ClInclude Include="..\..\include\DatabaseABC.h" />
+    <ClInclude Include="..\..\include\DDSAlgorithm.h" />
+    <ClInclude Include="..\..\include\DDSAU.h" />
+    <ClInclude Include="..\..\include\DecisionModule.h" />
+    <ClInclude Include="..\..\include\DiscreteDDSAlgorithm.h" />
+    <ClInclude Include="..\..\include\Exception.h" />
+    <ClInclude Include="..\..\include\FileList.h" />
+    <ClInclude Include="..\..\include\FilePair.h" />
+    <ClInclude Include="..\..\include\FilePipe.h" />
+    <ClInclude Include="..\..\include\FletchReevesAlgorithm.h" />
+    <ClInclude Include="..\..\include\FortranSupportUtilities.h" />
+    <ClInclude Include="..\..\include\GenConstrainedOpt.h" />
+    <ClInclude Include="..\..\include\Gene.h" />
+    <ClInclude Include="..\..\include\GeneticAlgorithm.h" />
+    <ClInclude Include="..\..\include\GeometryUtility.h" />
+    <ClInclude Include="..\..\include\GeomParamABC.h" />
+    <ClInclude Include="..\..\include\GLUE.h" />
+    <ClInclude Include="..\..\include\GridAlgorithm.h" />
+    <ClInclude Include="..\..\include\Interpolator.h" />
+    <ClInclude Include="..\..\include\IsoParse.h" />
+    <ClInclude Include="..\..\include\Isotherms.h" />
+    <ClInclude Include="..\..\include\KinniburghSolver.h" />
+    <ClInclude Include="..\..\include\KMeans_1601.h" />
+    <ClInclude Include="..\..\include\LatinHypercube.h" />
+    <ClInclude Include="..\..\include\LevenbergAlgorithm.h" />
+    <ClInclude Include="..\..\include\McCammonSolver.h" />
+    <ClInclude Include="..\..\include\MemoryTracker.h" />
+    <ClInclude Include="..\..\include\Model.h" />
+    <ClInclude Include="..\..\include\ModelABC.h" />
+    <ClInclude Include="..\..\include\ModelBackup.h" />
+    <ClInclude Include="..\..\include\MOPSOCD_Algorithm.h" />
+    <ClInclude Include="..\..\include\MOPSOCD_RandomLib.h" />
+    <ClInclude Include="..\..\include\MyComplex.h" />
+    <ClInclude Include="..\..\include\MyDebug.h" />
+    <ClInclude Include="..\..\include\MyErf.h" />
+    <ClInclude Include="..\..\include\MyHeaderInc.h" />
+    <ClInclude Include="..\..\include\MyTypes.h" />
+    <ClInclude Include="..\..\include\NetCDFConverter.h" />
+    <ClInclude Include="..\..\include\NSGAII_Algorithm.h" />
+    <ClInclude Include="..\..\include\ObjectiveFunction.h" />
+    <ClInclude Include="..\..\include\Observation.h" />
+    <ClInclude Include="..\..\include\ObservationGroup.h" />
+    <ClInclude Include="..\..\include\OptMathClass.h" />
+    <ClInclude Include="..\..\include\OptSearchClass.h" />
+    <ClInclude Include="..\..\include\OrearSolver.h" />
+    <ClInclude Include="..\..\include\PADDS.h" />
+    <ClInclude Include="..\..\include\PAES_Algorithm.h" />
+    <ClInclude Include="..\..\include\PAES_Genetics.h" />
+    <ClInclude Include="..\..\include\PAES_Helpers.h" />
+    <ClInclude Include="..\..\include\PAES_ObjFunc.h" />
+    <ClInclude Include="..\..\include\ParameterABC.h" />
+    <ClInclude Include="..\..\include\ParameterCorrection.h" />
+    <ClInclude Include="..\..\include\ParameterGroup.h" />
+    <ClInclude Include="..\..\include\ParamInitializerABC.h" />
+    <ClInclude Include="..\..\include\ParaPADDS.h" />
+    <ClInclude Include="..\..\include\ParticleSwarm.h" />
+    <ClInclude Include="..\..\include\PDDSAlgorithm.h" />
+    <ClInclude Include="..\..\include\PowellAlgorithm.h" />
+    <ClInclude Include="..\..\include\PumpAndTreat.h" />
+    <ClInclude Include="..\..\include\QuadTree.h" />
+    <ClInclude Include="..\..\include\RejectionSampler.h" />
+    <ClInclude Include="..\..\include\ResponseVar.h" />
+    <ClInclude Include="..\..\include\ResponseVarGroup.h" />
+    <ClInclude Include="..\..\include\RespVarABC.h" />
+    <ClInclude Include="..\..\include\SAAlgorithm.h" />
+    <ClInclude Include="..\..\include\SamplingAlgorithm.h" />
+    <ClInclude Include="..\..\include\SCEUA.h" />
+    <ClInclude Include="..\..\include\SMOOTH.h" />
+    <ClInclude Include="..\..\include\StatsClass.h" />
+    <ClInclude Include="..\..\include\StatUtility.h" />
+    <ClInclude Include="..\..\include\SteepDescAlgorithm.h" />
+    <ClInclude Include="..\..\include\SuperMUSE.h" />
+    <ClInclude Include="..\..\include\SuperMuseUtility.h" />
+    <ClInclude Include="..\..\include\SurrogateDbase.h" />
+    <ClInclude Include="..\..\include\SurrogateParameterGroup.h" />
+    <ClInclude Include="..\..\include\TelescopingBounds.h" />
+    <ClInclude Include="..\..\include\TiedParamABC.h" />
+    <ClInclude Include="..\..\include\TiedRespVar.h" />
+    <ClInclude Include="..\..\include\Tokens.h" />
+    <ClInclude Include="..\..\include\Utility.h" />
+    <ClInclude Include="..\..\include\ValueExtractor.h" />
+    <ClInclude Include="..\..\include\VandSA.h" />
+    <ClInclude Include="..\..\include\VARS_Algorithm.h" />
+    <ClInclude Include="..\..\include\VertexList.h" />
+    <ClInclude Include="..\..\include\WriteUtility.h" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

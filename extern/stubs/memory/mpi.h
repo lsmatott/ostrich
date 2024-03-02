@@ -10,6 +10,9 @@ Version History
 11-18-02    lsm   added copyright information and initial comments.
 08-20-03    lsm   created version history field and updated comments.
 ******************************************************************************/
+#ifndef USE_MPI_STUB
+#include <mpi.h>
+#else
 #ifndef MPI_INCLUDED
 #define MPI_INCLUDED
 
@@ -79,3 +82,4 @@ int MPI_Gather(void *sendbuf, int sendcnt, MPI_Datatype sendtype,
 #endif
 
 #endif /* MPI_INCLUDED */
+#endif /* USE_MPI_STUB */

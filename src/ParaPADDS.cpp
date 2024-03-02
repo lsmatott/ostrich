@@ -59,6 +59,7 @@ for a description of the algorithm:
 #include "Model.h"
 #include "ParameterGroup.h"
 #include "ParameterABC.h"
+#include "ParamInitializerABC.h"
 #include "ObjectiveFunction.h"
 
 #include "Utility.h"
@@ -166,6 +167,14 @@ void ParaPADDS::WriteMetrics(FILE * pFile)
    fprintf(pFile, "Non-Dominated Solutions : %d\n", m_NumNonDom);  
    fprintf(pFile, "Dominated Solutions     : %d\n", m_NumDom);     
    fprintf(pFile, "Selection Metric        : %s\n", select_str);
+   if(m_pModel->GetParamInitializerPtr() == NULL)
+   {
+      fprintf(pFile, "Initialization Method   : Uniform Random\n");
+   }
+   else
+   {
+      m_pModel->GetParamInitializerPtr()->Write(pFile, 0);
+   }
 
    m_pModel->WriteMetrics(pFile);
 }/* end WriteMetrics() */
@@ -177,6 +186,7 @@ Read configuration information from the given filename.
 ******************************************************************************/
 void ParaPADDS::InitFromFile(IroncladString pFileName)
 {
+   ParamInitializerABC * pParamInitializer;
    FILE * pFile;
    char * line;
    char tmp[DEF_STR_SZ];
@@ -195,6 +205,8 @@ void ParaPADDS::InitFromFile(IroncladString pFileName)
       LogError(ERR_FILE_IO, "Couldn't open PADDS config. file. Using Defaults");      
       return;
    }/* end if() */   
+
+   pParamInitializer = m_pModel->GetParamInitializerPtr();
 
   //accept multiple section headings
   if(CheckToken(pFile, "BeginParallelPADDSAlg", pFileName) == true)
@@ -291,6 +303,78 @@ void ParaPADDS::InitFromFile(IroncladString pFileName)
       } /* end while() */
    }/* end if() */   
 
+   /*
+   ------------------------------------------------------------------ 
+   initialize some or all DDS samples to manually specified values 
+   ------------------------------------------------------------------
+   */
+   rewind(pFile);
+   if(CheckToken(pFile, "BeginInitParams", pFileName) == true)
+   {
+      FindToken(pFile, "EndInitParams", pFileName);
+      rewind(pFile);
+
+      //count the number of entries
+      FindToken(pFile, "BeginInitParams", pFileName);
+      line = GetNxtDataLine(pFile, pFileName);
+      m_NumInit = 0;
+      while(strstr(line, "EndInitParams") == NULL)
+      {
+         m_NumInit++;
+         line = GetNxtDataLine(pFile, pFileName);
+      }/* end while() */
+   }
+
+   //allocate space for entries
+   int i, j, k;
+   int num = m_pModel->GetParamGroupPtr()->GetNumParams();
+   char * pTok;
+
+   if(pParamInitializer != NULL)
+   {
+      m_NumInit += pParamInitializer->GetNumParameterSets();
+   }
+   if(m_NumInit > 0)
+   {
+      NEW_PRINT("double *", m_NumInit);
+      m_pInit = new double * [m_NumInit];
+      MEM_CHECK(m_pInit);
+      for(i = 0; i < m_NumInit; i++)
+      { 
+         NEW_PRINT("double", num);
+         m_pInit[i] = new double[num];
+         MEM_CHECK(m_pInit[i]);
+      }
+   }/* end if() */
+
+   i = 0;
+   if(CheckToken(pFile, "BeginInitParams", pFileName) == true)
+   {
+      //read in entries
+      rewind(pFile);
+      FindToken(pFile, "BeginInitParams", pFileName);
+      line = GetNxtDataLine(pFile, pFileName);
+      while(strstr(line, "EndInitParams") == NULL)
+      {
+         pTok = line;
+         //extract values, one-by-one, making any necessary conversions
+         for(k = 0; k < num; k++)
+         {
+            j = ExtractString(pTok, tmp);
+            j = ValidateExtraction(j, k, num, "ParaPADDS::InitFromFile()");
+            pTok += j;            
+            m_pInit[i][k] = m_pModel->GetParamGroupPtr()->GetParamPtr(k)->ConvertInVal(atof(tmp));
+         }/* end for() */                  
+         i++;
+         line = GetNxtDataLine(pFile, pFileName);
+      }/* end while() */
+   }/* end if() */
+   // add in parameter sets from optional initializer
+   if(pParamInitializer != NULL)
+   {
+      pParamInitializer->GetParameterSets(m_pInit, i);
+   }
+
    fclose(pFile);
 
    #if(PARA_PADDS_DEBUG == 1)
@@ -300,9 +384,8 @@ void ParaPADDS::InitFromFile(IroncladString pFileName)
       printf("m_fraction1 = %lf\n", m_fraction1);
       fflush(stdout);
    #endif
-
 } /* end InitFromFile() */
-
+ 
 /******************************************************************************
 Calibrate()
 
@@ -474,6 +557,12 @@ void ParaPADDS::Optimize(void)
             num_rcvd++;
 
             WriteInnerEval(num_rcvd, m_maxiter, '.');
+
+            pStatus.curIter = num_rcvd;
+            pStatus.maxIter = m_maxiter;
+            pStatus.pct = (float)100.00*(float)num_rcvd/(float)m_maxiter;
+            pStatus.numRuns = num_rcvd;
+            WriteStatus(&pStatus);
 
             #if(PARA_PADDS_DEBUG == 1)
                printf("Proc %d : Master received the following result from processor %d :\n", m_rank, slaveindex);
@@ -685,11 +774,22 @@ void ParaPADDS::Optimize(void)
             ------------------------------------------------------------------- */
             if(num_sent < its) //sending intitialization tasks
             {
-               //generate a new random candidate
-               for (int j = 0; j < m_num_dec; j++)
+               if((m_pInit == NULL) || (num_sent < m_NumInit))
                {
-                  m_stest_flat[j] = S_min[j] + (S_max[j] - S_min[j])*UniformRandom();
-               }/* end for() */
+                  //generate a new random candidate
+                  for (int j = 0; j < m_num_dec; j++)
+                  {
+                     m_stest_flat[j] = S_min[j] + (S_max[j] - S_min[j])*UniformRandom();
+                  }/* end for() */
+               }
+               else 
+               {
+                  //load a pre-computed candidate
+                  for (int j = 0; j < m_num_dec; j++)
+                  {
+                     m_stest_flat[j] = m_pInit[num_sent][j];
+                  }/* end for() */
+               }
             }/* end if() */
             else //sending search tasks
             {
