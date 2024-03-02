@@ -396,7 +396,7 @@ Model::Model(void)
       #ifdef _WIN32
          copyCmd = "copy " + std::string(tmp1) + " " + std::string(pDirName);
       #else
-         copyCmd = "oy " + std::string(tmp1) + " " + std::string(pDirName);      
+         copyCmd = "cp " + std::string(tmp1) + " " + std::string(pDirName);      
       #endif
       system(copyCmd.data());
    } /* end if() */
